@@ -262,23 +262,18 @@ L.CartoDBInfowindow = L.Class.extend({
 			this._map.removeLayer(this);
 		}
 	},
-
-	_initLayout: function() {
-		this._container = L.DomUtil.create('div', 'cartodb-popup');
-
-		this._closeButton = L.DomUtil.create('a', 'cartodb-popup-close', this._container);
-		L.DomEvent.disableClickPropagation(this._closeButton);
-		this._closeButton.href = '#close';
-		this._closeButton.innerHTML = 'x';
+	
+	_initLayout:function(){
+		this._container=L.DomUtil.create("div","leaflet-popup");
+		this._closeButton=L.DomUtil.create("a","leaflet-popup-close-button",this._container);
+		this._closeButton.href="#close";
+		this._closeButton.innerHTML="x";
 		this._closeButton.onclick=L.Util.bind(this._onCloseButtonClick,this);
-
-
-		this._outerTop = L.DomUtil.create('div', 'cartodb-popup-outer-content', this._container);
-		L.DomEvent.disableClickPropagation(this._outerTop);
-		this._topContent = L.DomUtil.create('div', 'cartodb-popup-top-content', this._outerTop);
-		L.DomEvent.disableClickPropagation(this._outerTop);
-		this._bottomContent = L.DomUtil.create('div', 'cartodb-popup-bottom-content', this._container);
-		L.DomEvent.disableClickPropagation(this._outerTop);
+		L.DomEvent.disableClickPropagation(this._closeButton);
+		this._wrapper=L.DomUtil.create("div","leaflet-popup-content-wrapper",this._container);
+		L.DomEvent.disableClickPropagation(this._wrapper);
+		this._contentNode=L.DomUtil.create("div","leaflet-popup-content",this._wrapper);
+		this._tipContainer=L.DomUtil.create("div","leaflet-popup-tip-container",this._container);
 	},
 
 	_update: function() {
@@ -308,19 +303,19 @@ L.CartoDBInfowindow = L.Class.extend({
     var that = this;
     
 	  // Remove the list items
-	  this._topContent.innerHTML = '';
+	  this._contentNode.innerHTML = '';
 
 		// Add new ones
 		var content = '';
-	  for (p in variables) {
-	    if (p!='cartodb_id') {
+		 for (p in variables) {
+		   if (p!='cartodb_id') {
 		    content += '<label>'+p+'</label><p class="'+((variables[p]!=null)?'':'empty')+'">'+(variables[p] || 'empty')+'</p>';
-	    }
-	  }
-	  this._topContent.innerHTML = content;
+		   }
+		 }
+	  this._contentNode.innerHTML = content;
 	  
 	  // Show cartodb-id
-	  this._bottomContent.innerHTML = '<label>id: <strong>'+this._feature+'</strong></label>';
+	  this._tipContainer.innerHTML = '<label>id: <strong>'+this._feature+'</strong></label>';
 	},
 
 	_updateLayout: function() {

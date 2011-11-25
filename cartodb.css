@@ -3,19 +3,19 @@ html, body {height: 100%; margin: 0; padding: 0;}
 #map_canvas {height: 100%;}
 
 /*Marker infowindow*/
-div.cartodb-popup {position:absolute; display:block; width:214px; padding:0;}
-div.cartodb-popup a.cartodb-popup-close {position:absolute; right:3px; top:2px; width:22px; height:15px; padding:4px 0 3px 0; text-align:center; font:bold 15px "Helvetica",Arial; color:#666666; text-decoration:none; line-height:15px}
-div.cartodb-popup a.cartodb-popup-close:hover {color:#333333}
-div.cartodb-popup div.cartodb-popup-outer-content {width:186px; padding:25px 18px 5px 10px; background:url('sprite.png') 0 top;}
-div.cartodb-popup div.cartodb-popup-top-content {width:186px; max-height:200px; overflow-y:auto; overflow-x:hidden}
-div.cartodb-popup div.cartodb-popup-top-content .jspTrack {background: #dddddd;}
-div.cartodb-popup div.cartodb-popup-top-content .jspDrag {background: #999999;}
-div.cartodb-popup div.cartodb-popup-top-content .jspHover, div.cartodb-popup div.cartodb-popup-top-content .jspActive {background:#666666}
-div.cartodb-popup div.cartodb-popup-top-content label {display:block; width:auto; padding:0 0 0 5px; font:normal 11px Arial; color:#B3B3B3; text-shadow:0 1px white}
-div.cartodb-popup div.cartodb-popup-top-content p {display:block; width:170px; max-height:20px; padding:2px 4px; margin:2px 0 7px; font:bold 11px 'Helvetica',Arial; color:#666666; border:none; background:none; text-shadow:0 1px white;
+div.leaflet-popup {position:absolute; display:block; width:214px; padding:0;}
+div.leaflet-popup a.leaflet-popup-close-button {position:absolute; right:3px; top:2px; width:22px; height:15px; padding:4px 0 3px 0; text-align:center; font:bold 15px "Helvetica",Arial; color:#666666; text-decoration:none; line-height:15px; background:none; text-indent:0; overflow:visible}
+div.leaflet-popup a.leaflet-popup-close-button:hover {color:#333333}
+div.leaflet-popup div.leaflet-popup-content-wrapper {width:186px; padding:25px 18px 5px 10px; margin:0; background:url('sprite.png') 0 top; border:none; box-shadow:none; border-radius:0; -moz-border-radius:0; -webkit-border-radius:0}
+div.leaflet-popup div.leaflet-popup-content {width:186px; max-height:200px; padding:0; margin:0; overflow-y:auto; overflow-x:hidden}
+div.leaflet-popup div.leaflet-popup-content .jspTrack {background: #dddddd;}
+div.leaflet-popup div.leaflet-popup-content .jspDrag {background: #999999;}
+div.leaflet-popup div.leaflet-popup-content .jspHover, div.leaflet-popup div.leaflet-popup-top-content .jspActive {background:#666666}
+div.leaflet-popup div.leaflet-popup-content label {display:block; width:auto; padding:0 0 0 5px; font:normal 11px Arial; color:#B3B3B3; text-shadow:0 1px white}
+div.leaflet-popup div.leaflet-popup-content p {display:block; width:170px; max-height:20px; padding:2px 4px; margin:2px 0 7px; font:bold 11px 'Helvetica',Arial; color:#666666; border:none; background:none; text-shadow:0 1px white;
   text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
-div.cartodb-popup div.cartodb-popup-top-content p.empty {font-weight:normal; font-style:italic; color:#b7b7b7;}
+div.leaflet-popup div.leaflet-popup-content p.empty {font-weight:normal; font-style:italic; color:#b7b7b7;}
 /*div.cartodb_infowindow div.top p:focus {border:1px solid #666666; border-radius:5px; -webkit-border-radius:5px; -moz-border-radius:5px;}*/
-div.cartodb-popup div.cartodb-popup-bottom-content {width:180px; height:36px; padding:11px 16px 10px 10px; background:url('sprite.png') no-repeat right top;}
-div.cartodb-popup div.cartodb-popup-bottom-content label {float:left; margin:5px 0 0 3px; font:normal 11px Arial; color:#B3B3B3; text-shadow:0 1px white}
-div.cartodb-popup div.cartodb-popup-bottom-content label strong {font:bold 11px 'Helvetica',Arial; color:#666666; text-shadow:0 1px white;}
+div.leaflet-popup div.leaflet-popup-tip-container {width:180px; height:36px; padding:11px 16px 10px 10px; margin:0; background:url('sprite.png') no-repeat right top;}
+div.leaflet-popup div.leaflet-popup-tip-container label {float:left; margin:5px 0 0 3px; font:normal 11px Arial; color:#B3B3B3; text-shadow:0 1px white}
+div.leaflet-popup div.leaflet-popup-tip-container label strong {font:bold 11px 'Helvetica',Arial; color:#666666; text-shadow:0 1px white;}
