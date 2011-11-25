@@ -93,20 +93,14 @@ if (typeof(L.CartoDBLayer) === "undefined") {
           over: function(feature, div, opt3, evt){
 	          $('body').css({cursor:'pointer'});
           },
-          click: function(feature){
-	          $.ajax({
-					 	  method:'get',
-							url: 'http://'+ params.user_name +'.cartodb.com/api/v1/sql/?q='+escape('select *,ST_AsGeoJSON(ST_PointOnSurface(the_geom),6) as cdb_centre from '+ params.table_name + ' where cartodb_id=' + feature)+'&callback=?',
-							dataType: 'jsonp',
-							success: function(result) {
-								var latlng = transformGeoJSON(result.rows[0].cdb_centre);
-								params.popup.setLatLng(latlng);
-								params.popup.setContent('<strong>cartodb_id:</strong>  '+feature);
-
-								params.map.openPopup(params.popup);
-							},
-							error: function(e) {}
-						});
+          click: function(feature, div, op3, evt){
+	          //console.log(feature,div,op3,evt);
+	          
+	          var container_point = params.map.containerPointToLayerPoint(new L.Point(evt.clientX,evt.clientY));
+	          var latlng = params.map.layerPointToLatLng(container_point);
+	          params.popup.setLatLng(latlng);
+						params.popup.setContent(feature);
+						params.map.openPopup(params.popup);
           }
         },
         clickAction: 'location'
@@ -116,7 +110,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       params.map.addLayer(new wax.leaf.connector(params.tilejson));
      	params.interaction = wax.leaf.interaction(params.map, params.tilejson, params.waxOptions);
      	
-     	params.popup = new L.Popup();
+     	params.popup = new L.CartoDBInfowindow(params);
 
 	  }
     
@@ -156,5 +150,248 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	  }
 	  
   };
-
 }
+
+
+////////////////////////
+// CartoDB Infowindow //
+////////////////////////
+
+
+L.CartoDBInfowindow = L.Class.extend({
+	includes: L.Mixin.Events,
+
+	options: {
+		minWidth: 50,
+		maxWidth: 300,
+		autoPan: true,
+		closeButton: true,
+		offset: new L.Point(58, 2),
+		autoPanPadding: new L.Point(5, 5)
+	},
+
+	initialize: function(options) {
+		L.Util.setOptions(this, options);
+		this.getActiveColumns();
+	},
+	
+	getActiveColumns: function() {
+		var that = this;
+	  $.ajax({
+	    url:'http://' + this.options.user_name + '.cartodb.com/tiles/' + this.options.table_name + '/infowindow?callback=?',
+	    dataType: 'jsonp',
+	    success:function(result){
+	      var columns = JSON.parse(result.infowindow);
+	      if (columns) {
+	        that.columns_ = parseColumns(columns);
+	      } else {
+	        $.ajax({
+	      	  method:'get',
+	          url: 'http://'+ that.params_.user_name +'.cartodb.com/api/v1/sql/?q='+escape('select * from '+ that.params_.table_name + ' LIMIT 1'),
+	          dataType: 'jsonp',
+	          success: function(columns) {
+	            that.columns_ = parseColumns(columns.rows[0]);
+	          },
+	          error: function(e) {}
+	        });
+	      }
+	    },
+	    error: function(e){}
+	  });
+	  
+	  function parseColumns(columns) {
+	    var str = '';
+      for (p in columns) {
+        if (columns[p] && p!='the_geom_webmercator') {
+          str+=p+',';
+        }
+      }
+      return str.substr(0,str.length-1);
+	  }
+	},
+
+	onAdd: function(map) {
+		this._map = map;
+		if (!this._container) {
+			this._initLayout();
+		}
+		this._updateContent();
+
+		this._container.style.opacity = '0';
+
+		this._map._panes.popupPane.appendChild(this._container);
+		this._map.on('viewreset', this._updatePosition, this);
+		if (this._map.options.closePopupOnClick) {
+			this._map.on('preclick', this._close, this);
+		}
+		this._update();
+
+		this._container.style.opacity = '1'; //TODO fix ugly opacity hack
+
+		this._opened = true;
+	},
+
+	onRemove: function(map) {
+		map._panes.popupPane.removeChild(this._container);
+		map.off('viewreset', this._updatePosition, this);
+		map.off('click', this._close, this);
+
+		this._container.style.opacity = '0';
+
+		this._opened = false;
+	},
+
+	setLatLng: function(latlng) {
+		this._latlng = latlng;
+		if (this._opened) {
+			this._update();
+		}
+		return this;
+	},
+
+	setContent: function(feature) {
+		this._feature = feature;
+		if (this._opened) {
+			this._update();
+		}
+		return this;
+	},
+
+	_close: function() {
+		if (this._opened) {
+			this._map.removeLayer(this);
+		}
+	},
+
+	_initLayout: function() {
+		this._container = L.DomUtil.create('div', 'cartodb-popup');
+
+		this._closeButton = L.DomUtil.create('a', 'cartodb-popup-close', this._container);
+		L.DomEvent.disableClickPropagation(this._closeButton);
+		this._closeButton.href = '#close';
+		this._closeButton.innerHTML = 'x';
+		this._closeButton.onclick=L.Util.bind(this._onCloseButtonClick,this);
+
+
+		this._outerTop = L.DomUtil.create('div', 'cartodb-popup-outer-content', this._container);
+		L.DomEvent.disableClickPropagation(this._outerTop);
+		this._topContent = L.DomUtil.create('div', 'cartodb-popup-top-content', this._outerTop);
+		L.DomEvent.disableClickPropagation(this._outerTop);
+		this._bottomContent = L.DomUtil.create('div', 'cartodb-popup-bottom-content', this._container);
+		L.DomEvent.disableClickPropagation(this._outerTop);
+	},
+
+	_update: function() {
+		var that = this;
+		this._container.style.visibility = 'hidden';
+		
+		$.ajax({
+		  method:'get',
+	    url: 'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+escape('select '+this.columns_+' from '+ this.options.table_name + ' where cartodb_id=' + this._feature)+'&callback=?',
+	    dataType: 'jsonp',
+	    success: function(result) {
+	      that._updateContent(result.rows[0]);
+				that._updateLayout();
+				that._updatePosition();
+				that._container.style.visibility = '';
+				that._adjustPan();
+	    },
+	    error: function(e) {}
+	  });
+
+		
+	},
+
+	_updateContent: function(variables) {
+		if (!this._feature) return;
+    
+    var that = this;
+    
+	  // Remove the list items
+	  this._topContent.innerHTML = '';
+
+		// Add new ones
+		var content = '';
+	  for (p in variables) {
+	    if (p!='cartodb_id') {
+		    content += '<label>'+p+'</label><p class="'+((variables[p]!=null)?'':'empty')+'">'+(variables[p] || 'empty')+'</p>';
+	    }
+	  }
+	  this._topContent.innerHTML = content;
+	  
+	  // Show cartodb-id
+	  this._bottomContent.innerHTML = '<label>id: <strong>'+this._feature+'</strong></label>';
+	},
+
+	_updateLayout: function() {
+		this._container.style.width = '';
+		this._container.style.whiteSpace = 'nowrap';
+
+		var width = this._container.offsetWidth;
+
+		this._container.style.width = (width > this.options.maxWidth ? this.options.maxWidth : (width < this.options.minWidth ? this.options.minWidth : width ) ) + 'px';
+		this._container.style.whiteSpace = '';
+
+		this._containerWidth = this._container.offsetWidth;
+	},
+
+	_updatePosition: function() {
+		var pos = this._map.latLngToLayerPoint(this._latlng);
+
+		this._containerBottom = -pos.y - this.options.offset.y;
+		this._containerLeft = pos.x - Math.round(this._containerWidth/2) + this.options.offset.x;
+
+		this._container.style.bottom = this._containerBottom + 'px';
+		this._container.style.left = this._containerLeft + 'px';
+	},
+
+	_adjustPan: function() {
+		if (!this.options.autoPan) { return; }
+
+		var containerHeight = this._container.offsetHeight,
+			layerPos = new L.Point(
+				this._containerLeft,
+				-containerHeight - this._containerBottom),
+			containerPos = this._map.layerPointToContainerPoint(layerPos),
+			adjustOffset = new L.Point(0, 0),
+			padding = this.options.autoPanPadding,
+			size = this._map.getSize();
+
+		if (containerPos.x < 0) {
+			adjustOffset.x = containerPos.x - padding.x;
+		}
+		if (containerPos.x + this._containerWidth > size.x) {
+			adjustOffset.x = containerPos.x + this._containerWidth - size.x + padding.x;
+		}
+		if (containerPos.y < 0) {
+			adjustOffset.y = containerPos.y - padding.y;
+		}
+		if (containerPos.y + containerHeight > size.y) {
+			adjustOffset.y = containerPos.y + containerHeight - size.y + padding.y;
+		}
+
+		if (adjustOffset.x || adjustOffset.y) {
+			this._map.panBy(adjustOffset);
+		}
+	},
+
+	_onCloseButtonClick: function(e) {
+		this._close();
+		L.DomEvent.stop(e);
+	}
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

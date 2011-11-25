@@ -13,27 +13,23 @@
   <script type="text/javascript" src="cartodb-leaflet.js"></script>
 
   <script type="text/javascript">
-
-
-  function initialize() {
-		var map = new L.Map('map_canvas');
-		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
-		map.addLayer(cloudmade);
-
-    var cartodb_leaflet = new L.CartoDBLayer({
-      map_canvas: 'map_canvas',
-      map: map,
-      user_name:'xavijam',
-      table_name: 'test2',
-      query: "SELECT * FROM test2",
-      infowindow: true,
-      auto_bound: true,
-    });
-    
-
-  }
+	  function initialize() {
+			var map = new L.Map('map_canvas');
+			var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
+			map.addLayer(cloudmade);
+	
+	    var cartodb_leaflet = new L.CartoDBLayer({
+	      map_canvas: 'map_canvas',
+	      map: map,
+	      user_name:'xavijam',
+	      table_name: 'test2',
+	      query: "SELECT * FROM test2",
+	      infowindow: true,
+	      auto_bound: true,
+	    });
+	  }
   </script>
 </head>
 <body onload="initialize()">
