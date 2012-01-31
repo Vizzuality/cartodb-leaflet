@@ -18,12 +18,16 @@ Params
 The library accepts certain params to manage the cartodb layer:
 
 * map_canvas (required): 	The DOM element id where the map is
-* map (required): 				The leaflet map object create before
+* map (required): 			The leaflet map object create before
 * username (required): 		Your CartoDB user name
 * table_name (required): 	Your CartoDB table name
-* query (required): 			A query to experiment with
-* infowindow:							If you want to add interactivity to the layer, showing the infowindow
-* autobound:							If you want to zoom in the area where the layer is positioned
+* query (required): 	    A query to experiment with
+* map_key:                  If your table is private, you'll need the map_key parameter
+* infowindow:               If you want to add interactivity to the layer, showing the infowindow
+                            (if you make a query, to show the point/polygon is absolutely necessary ask for 'cartodb_id' and 'the_geom_webmercator')
+* tile_style:               If you want to add other style to the layer
+* infowindow:				If you want to add interactivity to the layer, showing the infowindow
+* autobound:                If you want to zoom in the area where the layer is positioned
 
 
 Example
@@ -44,8 +48,21 @@ And then add the cartodb layer:
     	user_name:'xavijam',
     	table_name: 'test2',
     	query: "SELECT * FROM test2",
+        tile_style: "#test2{line-color:#719700;line-width:1;line-opacity:0.6;polygon-opacity:0.6;}",
+        map_key: "6087bc5111352713a81a48491078f182a0541f6c",
     	infowindow: true,
     	auto_bound: true});
+
+
+Functions
+---------
+New funcionalities are coming, in the meantime you can use:
+
+* update: It needs a new query to work. Example: cartodb_leaflet.update('SELECT * FROM test WHERE cartodb_id>2');
+* destroy: Removes the cartodb layer from the map. Example: cartodb_leaflet.destroy();
+* hide: Hide the cartodb layer from the map (For now, hide and destroy are the same, but will be replace in the future).
+* show: Show again the cartodb layer in the map. Example: cartodb_leaflet.show();
+* isVisible: Returns if cartodb layer is visible or not. Example: cartodb_leaflet.isVisible(); -> true | false
 
 
 [live example](http://vizzuality.github.com/cartodb-leaflet/)

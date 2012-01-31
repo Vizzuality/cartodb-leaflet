@@ -7,12 +7,15 @@
   <link href="leaflet.css" rel="stylesheet" type="text/css" />
   <link href="leaflet.ie.css" rel="stylesheet" type="text/css" />
   <link  href="cartodb.css" rel="stylesheet" type="text/css">
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script type="text/javascript" src="leaflet.js"></script>
   <script type="text/javascript" src="wax.leaflet.min.js"></script>
   <script type="text/javascript" src="cartodb-leaflet.js"></script>
 
   <script type="text/javascript">
+  	var cartodb_leaflet1
+  		, cartodb_leaflet2;
+
 	  function initialize() {
 			var map = new L.Map('map_canvas');
 			var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
@@ -20,15 +23,31 @@
 	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
 			map.addLayer(cloudmade);
 	
-	    var cartodb_leaflet = new L.CartoDBLayer({
+	    cartodb_leaflet1 = new L.CartoDBLayer({
 	      map_canvas: 'map_canvas',
 	      map: map,
 	      user_name:'xavijam',
 	      table_name: 'test2',
-	      query: "SELECT * FROM test2",
+	      query: "SELECT cartodb_id,the_geom_webmercator,description FROM test2",
+	      tile_style: "#test2{line-color:#719700;line-width:1;line-opacity:0.6;polygon-opacity:0.6;}",
+	      map_key: "6087bc5111352713a81a48491078f182a0541f6c",
 	      infowindow: true,
 	      auto_bound: true,
+	      debug: true
 	    });
+
+	    cartodb_leaflet2 = new L.CartoDBLayer({
+	      map_canvas: 'map_canvas',
+	      map: map,
+	      user_name:'xavijam',
+	      table_name: 'points',
+	      query: "SELECT cartodb_id,the_geom_webmercator,description FROM points",
+	      map_key: "6087bc5111352713a81a48491078f182a0541f6c",
+	      infowindow: true,
+	      auto_bound: false,
+	      debug: true
+	    });
+
 	  }
   </script>
 </head>

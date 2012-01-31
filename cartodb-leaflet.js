@@ -19,28 +19,33 @@ if (typeof(L.CartoDBLayer) === "undefined") {
    *   	user_name 		-		 	CartoDB user name
    *   	table_name 		-			CartoDB table name
    *    query					-			If you want to apply any sql sentence to the table...
+   * 		map_key				-			If your table is private, you'll need the map_key parameter
+   * 		tile_style		-			If you want to add other style to the layer
    *		infowindow		-			If you want to see infowindows when click in a geometry (opcional - default = false)
    *		auto_bound		-			Let cartodb auto-bound-zoom in the map (opcional - default = false)
    */
    
   L.CartoDBLayer = function (params) {
     
-    var defaults = params;
+    this.params = params;
     
-    if (params.infowindow) {
-		  addWaxCartoDBTiles(params)
+    if (this.params.infowindow) {
+		  addWaxCartoDBTiles(this.params)
 		} else {
-		  addSimpleCartoDBTiles(params);											// Always add cartodb tiles, simple or with wax.
+		  addSimpleCartoDBTiles(this.params);											// Always add cartodb tiles, simple or with wax.
 		}
-		if (params.auto_bound) 	autoBound(params);						// Bounds? CartoDB does it.
+		if (this.params.auto_bound) 	autoBound(this.params);						// Bounds? CartoDB does it.
 	  
+	  this.params.visible = true,
+	  this.params.active = true;
 	  
 	  // Zoom to cartodb geometries
 	  function autoBound(params) {
 			// Zoom to your geometries
+			var that = this;
 		  $.ajax({
 			  method:'get',
-		    url: 'http://'+params.user_name+'.cartodb.com/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ params.table_name)+'&callback=?',
+		    url: 'http://'+ params.user_name +'.cartodb.com/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ params.table_name) +'&callback=?',
 		    dataType: 'jsonp',
 		    success: function(result) {
 		      if (result.rows[0].st_extent!=null) {
@@ -65,20 +70,20 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 		      }
 		  
 		    },
-		    error: function(e) {}
+		    error: function(e) {params.debug && console.debug(e)}
 		  });	    
 	  }
-	  
-
 	  
 	  // Add cartodb tiles to the map
 	  function addSimpleCartoDBTiles(params) {
 		  // Add the cartodb tiles
-		  var cartodb_url = 'http://' + params.user_name + '.cartodb.com/tiles/' + params.table_name + '/{z}/{x}/{y}.png?sql='+params.query,
-    			cartodb_layer = new L.TileLayer(cartodb_url);
+		  var cartodb_url = 'http://' + params.user_name + '.cartodb.com/tiles/' + params.table_name + '/{z}/{x}/{y}.png?sql=' + params.query +
+		  	'&map_key=' + (params.map_key || '') + '&style=' + ((params.tile_style)?encodeURIComponent(params.tile_style):'')
+		  	, cartodb_layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB'});
+
+		  params.layer = cartodb_layer;
 			params.map.addLayer(cartodb_layer);
 	  }
-	  
 	  
 	  // Add cartodb tiles to the map
 	  function addWaxCartoDBTiles(params) {
@@ -93,9 +98,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
           over: function(feature, div, opt3, evt){
 	          $('body').css({cursor:'pointer'});
           },
-          click: function(feature, div, op3, evt){
-	          //console.log(feature,div,op3,evt);
-	          
+          click: function(feature, div, op3, evt){	          
 	          var container_point = params.map.containerPointToLayerPoint(new L.Point(evt.clientX,evt.clientY));
 	          var latlng = params.map.layerPointToLatLng(container_point);
 	          params.popup.setLatLng(latlng);
@@ -106,15 +109,14 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         clickAction: 'location'
       };
 
-			var wax_tile = new wax.leaf.connector(params.tilejson);
-      params.map.addLayer(new wax.leaf.connector(params.tilejson));
+			params.layer = new wax.leaf.connector(params.tilejson);
+      params.map.addLayer(params.layer);
      	params.interaction = wax.leaf.interaction(params.map, params.tilejson, params.waxOptions);
-     	
      	params.popup = new L.CartoDBInfowindow(params);
-
 	  }
-    
-    
+
+
+    // Generate tile json for wax
     function generateTileJson() {
       var core_url = 'http://' + params.user_name + '.cartodb.com';  
       var base_url = core_url + '/tiles/' + params.table_name + '/{z}/{x}/{y}';
@@ -126,6 +128,20 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         var query = 'sql=' + params.query;
         tile_url = wax.util.addUrlData(tile_url, query);
         grid_url = wax.util.addUrlData(grid_url, query);
+      }
+
+      // MAP KEY?
+      if (params.map_key) {
+        var map_key = 'map_key=' + params.map_key;
+        tile_url = wax.util.addUrlData(tile_url, map_key);
+        grid_url = wax.util.addUrlData(grid_url, map_key);
+      }
+
+      // STYLE?
+      if (params.tile_style) {
+        var style = 'style=' + encodeURIComponent(params.tile_style);
+        tile_url = wax.util.addUrlData(tile_url, style);
+        grid_url = wax.util.addUrlData(grid_url, style);
       }
       
       // Build up the tileJSON
@@ -143,12 +159,70 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         }
       };
     }
-    
+   
+   	// Function to transform GeoJSON to Leaflet coordinates 
     function transformGeoJSON(str) {
 	    var json = JSON.parse(str);
 	    return new L.LatLng(json.coordinates[1],json.coordinates[0]);
 	  }
 	  
+
+	  // Update tiles & interactivity layer;
+    L.CartoDBLayer.prototype.update = function(sql) {
+    	this.params.query = sql;
+
+      // Hide the infowindow
+      if (this.params.popup) 
+        this.params.popup._close();
+      
+      // Destroy layer
+      this.destroy();
+
+      // Add new one updated
+      if (this.params.popup)
+			  addWaxCartoDBTiles(this.params)
+			else
+			  addSimpleCartoDBTiles(this.params);
+			
+
+      this.params.active = true;
+      this.params.visible = true;
+    };
+
+    // Destroy layers from the map
+    L.CartoDBLayer.prototype.destroy = function() {
+     	// First remove previous cartodb - tiles.
+     	this.params.map.removeLayer(this.params.layer);
+
+    	if (this.params.popup) {
+        // Remove wax interaction
+        this.params.interaction.remove();
+        this.params.popup._close();
+    	}
+
+    	this.params.active = false;
+    };
+
+		
+		// Hide layers from the map
+    L.CartoDBLayer.prototype.hide = function() {
+    	this.destroy();
+    	this.params.visible = false;
+    };
+		    
+
+    // Show layers from the map
+    L.CartoDBLayer.prototype.show = function() {
+      if (!this.params.visible || !this.params.active) {
+        this.update(this.params.query);
+        this.params.visible = true;
+      }
+    };
+
+    // CartoDB layer visible?
+    L.CartoDBLayer.prototype.isVisible = function() {
+    	return this.params.visible;
+    };
   };
 }
 
@@ -156,7 +230,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 ////////////////////////
 // CartoDB Infowindow //
 ////////////////////////
-
 
 L.CartoDBInfowindow = L.Class.extend({
 	includes: L.Mixin.Events,
@@ -172,42 +245,6 @@ L.CartoDBInfowindow = L.Class.extend({
 
 	initialize: function(options) {
 		L.Util.setOptions(this, options);
-		this.getActiveColumns();
-	},
-	
-	getActiveColumns: function() {
-		var that = this;
-	  $.ajax({
-	    url:'http://' + this.options.user_name + '.cartodb.com/tiles/' + this.options.table_name + '/infowindow?callback=?',
-	    dataType: 'jsonp',
-	    success:function(result){
-	      var columns = JSON.parse(result.infowindow);
-	      if (columns) {
-	        that.columns_ = parseColumns(columns);
-	      } else {
-	        $.ajax({
-	      	  method:'get',
-	          url: 'http://'+ that.params_.user_name +'.cartodb.com/api/v1/sql/?q='+escape('select * from '+ that.params_.table_name + ' LIMIT 1'),
-	          dataType: 'jsonp',
-	          success: function(columns) {
-	            that.columns_ = parseColumns(columns.rows[0]);
-	          },
-	          error: function(e) {}
-	        });
-	      }
-	    },
-	    error: function(e){}
-	  });
-	  
-	  function parseColumns(columns) {
-	    var str = '';
-      for (p in columns) {
-        if (columns[p] && p!='the_geom_webmercator') {
-          str+=p+',';
-        }
-      }
-      return str.substr(0,str.length-1);
-	  }
 	},
 
 	onAdd: function(map) {
@@ -225,20 +262,12 @@ L.CartoDBInfowindow = L.Class.extend({
 			this._map.on('preclick', this._close, this);
 		}
 		this._update();
-
-		this._container.style.opacity = '1'; //TODO fix ugly opacity hack
-
-		this._opened = true;
 	},
 
 	onRemove: function(map) {
 		map._panes.popupPane.removeChild(this._container);
 		map.off('viewreset', this._updatePosition, this);
 		map.off('click', this._close, this);
-
-		this._container.style.opacity = '0';
-
-		this._opened = false;
 	},
 
 	setLatLng: function(latlng) {
@@ -257,9 +286,35 @@ L.CartoDBInfowindow = L.Class.extend({
 		return this;
 	},
 
+	_open: function() {
+		var div = this._container;
+		div.style.opacity = 0;
+		div.style.visibility = "visible";
+		$(div).animate({
+      bottom: '+=' + 10 + 'px',
+      opacity: 1},
+      200
+		);
+		this._opened = true;
+	},
+
+
 	_close: function() {
 		if (this._opened) {
-			this._map.removeLayer(this);
+			var div = this._container
+				, that = this;
+		
+			$(div).animate({
+	      bottom: '-=' + 10 + 'px',
+	      opacity: 0},
+	      100,
+	      function() {
+	      	div.style.visibility = "hidden";
+	      	that._map.removeLayer(that);
+	      }
+			);
+
+			this._opened = false;
 		}
 	},
 	
@@ -282,7 +337,7 @@ L.CartoDBInfowindow = L.Class.extend({
 		
 		$.ajax({
 		  method:'get',
-	    url: 'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+escape('select '+this.columns_+' from '+ this.options.table_name + ' where cartodb_id=' + this._feature)+'&callback=?',
+	    url: 'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+encodeURIComponent(this.options.query + ' where cartodb_id=' + this._feature)+'&callback=?',
 	    dataType: 'jsonp',
 	    success: function(result) {
 	      that._updateContent(result.rows[0]);
@@ -290,8 +345,9 @@ L.CartoDBInfowindow = L.Class.extend({
 				that._updatePosition();
 				that._container.style.visibility = '';
 				that._adjustPan();
+				that._open();
 	    },
-	    error: function(e) {}
+	    error: function(e) {that.debug && console.debug(e)}
 	  });
 
 		
@@ -308,8 +364,8 @@ L.CartoDBInfowindow = L.Class.extend({
 		// Add new ones
 		var content = '';
 		 for (p in variables) {
-		   if (p!='cartodb_id') {
-		    content += '<label>'+p+'</label><p class="'+((variables[p]!=null)?'':'empty')+'">'+(variables[p] || 'empty')+'</p>';
+		   if (p!='cartodb_id' && p!='the_geom_webmercator') {
+		    content += '<label>'+p+'</label><p class="'+((variables[p]!=null && variables[p]!='')?'':'empty')+'">'+(variables[p] || 'empty')+'</p>';
 		   }
 		 }
 	  this._contentNode.innerHTML = content;
@@ -375,18 +431,3 @@ L.CartoDBInfowindow = L.Class.extend({
 		L.DomEvent.stop(e);
 	}
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
