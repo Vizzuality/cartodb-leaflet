@@ -23,8 +23,7 @@ The library accepts certain params to manage the cartodb layer:
 * table_name (required): 	Your CartoDB table name
 * query (required): 	    A query to experiment with
 * map_key:                  If your table is private, you'll need the map_key parameter
-* infowindow:               If you want to add interactivity to the layer, showing the infowindow
-                            (if you make a query, to show the point/polygon is absolutely necessary ask for 'cartodb_id' and 'the_geom_webmercator')
+* infowindow:               if you want to add interactivity to the layer, showing the infowindow (It must be a query, adding WHERE cartodb_id={{feature}}', later it will be replace by the clicked cartodb_id.)
 * tile_style:               If you want to add other style to the layer
 * infowindow:				If you want to add interactivity to the layer, showing the infowindow
 * autobound:                If you want to zoom in the area where the layer is positioned
@@ -50,7 +49,7 @@ And then add the cartodb layer:
     	query: "SELECT * FROM test2",
         tile_style: "#test2{line-color:#719700;line-width:1;line-opacity:0.6;polygon-opacity:0.6;}",
         map_key: "6087bc5111352713a81a48491078f182a0541f6c",
-    	infowindow: true,
+    	infowindow: "SELECT cartodb_id,the_geom_webmercator,description FROM test2 WHERE cartodb_id={{feature}}",
     	auto_bound: true});
 
 

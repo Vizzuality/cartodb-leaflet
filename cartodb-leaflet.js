@@ -28,13 +28,14 @@ if (typeof(L.CartoDBLayer) === "undefined") {
   L.CartoDBLayer = function (params) {
     
     this.params = params;
+
+    if (this.params.auto_bound) 	autoBound(this.params);			// Bounds? CartoDB does it.
     
     if (this.params.infowindow) {
 		  addWaxCartoDBTiles(this.params)
 		} else {
 		  addSimpleCartoDBTiles(this.params);											// Always add cartodb tiles, simple or with wax.
 		}
-		if (this.params.auto_bound) 	autoBound(this.params);						// Bounds? CartoDB does it.
 	  
 	  this.params.visible = true,
 	  this.params.active = true;
@@ -43,35 +44,31 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	  function autoBound(params) {
 			// Zoom to your geometries
 			var that = this;
-		  $.ajax({
-			  method:'get',
-		    url: 'http://'+ params.user_name +'.cartodb.com/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ params.table_name) +'&callback=?',
-		    dataType: 'jsonp',
-		    success: function(result) {
-		      if (result.rows[0].st_extent!=null) {
-		        var coordinates = result.rows[0].st_extent.replace('BOX(','').replace(')','').split(',');
-		  
-		        var coor1 = coordinates[0].split(' ');
-		        var coor2 = coordinates[1].split(' ');
-		  			
-		        // Check bounds
-		        if (coor1[0] >  180 || coor1[0] < -180 || coor1[1] >  90 || coor1[1] < -90 
-			        || coor2[0] >  180 || coor2[0] < -180 || coor2[1] >  90  || coor2[1] < -90) {
-		          coor1[0] = '-30';
-		          coor1[1] = '-50'; 
-		          coor2[0] = '110'; 
-		          coor2[1] =  '80'; 
-		        }
 
-		  			var pos1 = new L.LatLng(parseFloat(coor1[1]),parseFloat(coor1[0]));
-		  			var pos2 = new L.LatLng(parseFloat(coor2[1]),parseFloat(coor2[0]));
-		  			var bounds = new L.LatLngBounds(pos1,pos2);
-		        params.map.fitBounds(bounds);
-		      }
-		  
-		    },
-		    error: function(e) {params.debug && console.debug(e)}
-		  });	    
+			$.getJSON('http://'+params.user_name+'.cartodb.com/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ params.table_name)+'&callback=?', function(result) {
+        if (result.rows[0].st_extent!=null) {
+          var coordinates = result.rows[0].st_extent.replace('BOX(','').replace(')','').split(',');
+	  
+	        var coor1 = coordinates[0].split(' ');
+	        var coor2 = coordinates[1].split(' ');
+	  			
+	        // Check bounds
+	        if (coor1[0] >  180 || coor1[0] < -180 || coor1[1] >  90 || coor1[1] < -90 
+		        || coor2[0] >  180 || coor2[0] < -180 || coor2[1] >  90  || coor2[1] < -90) {
+	          coor1[0] = '-30';
+	          coor1[1] = '-50'; 
+	          coor2[0] = '110'; 
+	          coor2[1] =  '80'; 
+	        }
+
+	  			var pos1 = new L.LatLng(parseFloat(coor1[1]),parseFloat(coor1[0]));
+	  			var pos2 = new L.LatLng(parseFloat(coor2[1]),parseFloat(coor2[0]));
+	  			var bounds = new L.LatLngBounds(pos1,pos2);
+	        params.map.fitBounds(bounds);
+        }
+      }).error(function(e, msg) {
+        params.debug && console.debug('Error setting table bounds: ' + msg)
+      });
 	  }
 	  
 	  // Add cartodb tiles to the map
@@ -332,25 +329,26 @@ L.CartoDBInfowindow = L.Class.extend({
 	},
 
 	_update: function() {
-		var that = this;
+		var that = this
+			, infowindow_sql = 'SELECT * FROM ' + this.options.table_name + ' WHERE cartodb_id=' + this._feature;
+		
 		this._container.style.visibility = 'hidden';
-		
-		$.ajax({
-		  method:'get',
-	    url: 'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+encodeURIComponent(this.options.query + ' where cartodb_id=' + this._feature)+'&callback=?',
-	    dataType: 'jsonp',
-	    success: function(result) {
-	      that._updateContent(result.rows[0]);
-				that._updateLayout();
-				that._updatePosition();
-				that._container.style.visibility = '';
-				that._adjustPan();
-				that._open();
-	    },
-	    error: function(e) {that.debug && console.debug(e)}
-	  });
 
-		
+		// If the table is private, you can't run any api methods
+    if (this.options.infowindow!=true) {
+      infowindow_sql = encodeURIComponent(this.options.infowindow.replace('{{feature}}',this._feature));
+    }
+      
+    $.getJSON('http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+infowindow_sql + '&callback=', function(result) {
+    	that._updateContent(result.rows[0]);
+			that._updateLayout();
+			that._updatePosition();
+			that._container.style.visibility = '';
+			that._adjustPan();
+			that._open();
+    }).error(function(e, msg) {
+      that.params_.debug && console.debug('Error retrieving infowindow variables: ' + msg)
+    });
 	},
 
 	_updateContent: function(variables) {
