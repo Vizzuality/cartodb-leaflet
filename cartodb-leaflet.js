@@ -85,6 +85,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	  // Add cartodb tiles to the map
 	  function addWaxCartoDBTiles(params) {
       // interaction placeholder
+      debugger;
       params.tilejson = generateTileJson();
 
 			params.waxOptions = {
@@ -181,7 +182,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 			else
 			  addSimpleCartoDBTiles(this.params);
 			
-
       this.params.active = true;
       this.params.visible = true;
     };
@@ -189,12 +189,19 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     // Destroy layers from the map
     L.CartoDBLayer.prototype.destroy = function() {
      	// First remove previous cartodb - tiles.
-     	this.params.map.removeLayer(this.params.layer);
+     	if (this.params.layer) {
+     		this.params.map.removeLayer(this.params.layer);
+     		delete this.params['layer'];
+     	}
 
     	if (this.params.popup) {
         // Remove wax interaction
         this.params.interaction.remove();
         this.params.popup._close();
+        delete this.params['interaction'];
+        delete this.params['waxOptions'];
+        delete this.params['tilejson'];
+        delete this.params['popup'];
     	}
 
     	this.params.active = false;
@@ -203,7 +210,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 		
 		// Hide layers from the map
     L.CartoDBLayer.prototype.hide = function() {
-    	this.destroy();
+    	if (this.params.visible)
+    		this.destroy();
     	this.params.visible = false;
     };
 		    
@@ -212,7 +220,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     L.CartoDBLayer.prototype.show = function() {
       if (!this.params.visible || !this.params.active) {
         this.update(this.params.query);
-        this.params.visible = true;
       }
     };
 
