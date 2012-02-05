@@ -45,30 +45,36 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 			// Zoom to your geometries
 			var that = this;
 
-			$.getJSON('http://'+params.user_name+'.cartodb.com/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ params.table_name)+'&callback=?', function(result) {
-        if (result.rows[0].st_extent!=null) {
-          var coordinates = result.rows[0].st_extent.replace('BOX(','').replace(')','').split(',');
-	  
-	        var coor1 = coordinates[0].split(' ');
-	        var coor2 = coordinates[1].split(' ');
-	  			
-	        // Check bounds
-	        if (coor1[0] >  180 || coor1[0] < -180 || coor1[1] >  90 || coor1[1] < -90 
-		        || coor2[0] >  180 || coor2[0] < -180 || coor2[1] >  90  || coor2[1] < -90) {
-	          coor1[0] = '-30';
-	          coor1[1] = '-50'; 
-	          coor2[0] = '110'; 
-	          coor2[1] =  '80'; 
-	        }
+			$.ajax({
+	      url:'http://'+params.user_name+'.cartodb.com/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ params.table_name),
+	      dataType: 'jsonp',
+	      timeout: 2000,
+	      callbackParameter: 'callback',
+	      success: function(result) {
+	        if (result.rows[0].st_extent!=null) {
+	          var coordinates = result.rows[0].st_extent.replace('BOX(','').replace(')','').split(',');
+	          var coor1 = coordinates[0].split(' ');
+	          var coor2 = coordinates[1].split(' ');
 
-	  			var pos1 = new L.LatLng(parseFloat(coor1[1]),parseFloat(coor1[0]));
-	  			var pos2 = new L.LatLng(parseFloat(coor2[1]),parseFloat(coor2[0]));
-	  			var bounds = new L.LatLngBounds(pos1,pos2);
-	        params.map.fitBounds(bounds);
-        }
-      }).error(function(e, msg) {
-        params.debug && console.debug('Error setting table bounds: ' + msg)
-      });
+	          // Check bounds
+	          if (coor1[0] >  180 || coor1[0] < -180 || coor1[1] >  90 || coor1[1] < -90 
+	            || coor2[0] >  180 || coor2[0] < -180 || coor2[1] >  90  || coor2[1] < -90) {
+	            coor1[0] = '-30';
+	            coor1[1] = '-50'; 
+	            coor2[0] = '110'; 
+	            coor2[1] =  '80'; 
+	          }
+
+	          var pos1 = new L.LatLng(parseFloat(coor1[1]),parseFloat(coor1[0]));
+	  				var pos2 = new L.LatLng(parseFloat(coor2[1]),parseFloat(coor2[0]));
+	  				var bounds = new L.LatLngBounds(pos1,pos2);
+	        	params.map.fitBounds(bounds);
+	        }
+	      },
+	      error: function(e,msg) {
+	        params.debug && console.debug('Error setting table bounds: ' + msg);
+	      }
+	    });
 	  }
 	  
 	  // Add cartodb tiles to the map
@@ -85,7 +91,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	  // Add cartodb tiles to the map
 	  function addWaxCartoDBTiles(params) {
       // interaction placeholder
-      debugger;
       params.tilejson = generateTileJson();
 
 			params.waxOptions = {
@@ -96,7 +101,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
           over: function(feature, div, opt3, evt){
 	          $('body').css({cursor:'pointer'});
           },
-          click: function(feature, div, op3, evt){	          
+          click: function(feature, div, op3, evt) {
 	          var container_point = params.map.containerPointToLayerPoint(new L.Point(evt.clientX,evt.clientY));
 	          var latlng = params.map.layerPointToLatLng(container_point);
 	          params.popup.setLatLng(latlng);
@@ -346,15 +351,23 @@ L.CartoDBInfowindow = L.Class.extend({
       infowindow_sql = encodeURIComponent(this.options.infowindow.replace('{{feature}}',this._feature));
     }
       
-    $.getJSON('http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+infowindow_sql + '&callback=', function(result) {
-    	that._updateContent(result.rows[0]);
-			that._updateLayout();
-			that._updatePosition();
-			that._container.style.visibility = '';
-			that._adjustPan();
-			that._open();
-    }).error(function(e, msg) {
-      that.params_.debug && console.debug('Error retrieving infowindow variables: ' + msg)
+
+    $.ajax({
+	    url:'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+infowindow_sql,
+    	dataType: 'jsonp',
+	    timeout: 2000,
+	    callbackParameter: 'callback',
+	    success: function(result) {
+    		that._updateContent(result.rows[0]);
+				that._updateLayout();
+				that._updatePosition();
+				that._container.style.visibility = '';
+				that._adjustPan();
+				that._open();
+			},
+    	error: function(e, msg) {
+      	that.params_.debug && console.debug('Error retrieving infowindow variables: ' + msg)
+      }
     });
 	},
 
