@@ -24,29 +24,29 @@
 	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
 			map.addLayer(cloudmade);
 	
-	    cartodb_leaflet1 = new L.CartoDBLayer({
-	      map_canvas: 'map_canvas',
-	      map: map,
-	      user_name:'xavijam',
-	      table_name: 'test2',
-	      query: "SELECT cartodb_id,the_geom_webmercator,description FROM test2",
-	      tile_style: "#test2{line-color:#719700;line-width:1;line-opacity:0.6;polygon-opacity:0.6;}",
-	      map_key: "6087bc5111352713a81a48491078f182a0541f6c",
-	      infowindow: "SELECT cartodb_id,the_geom_webmercator,description FROM test2 WHERE cartodb_id={{feature}}",
-	      auto_bound: true,
-	      debug: true
-	    });
+
+	    // cartodb_leaflet1 = new L.CartoDBLayer({
+	    //   map_canvas: 'map_canvas',
+	    //   map: map,
+	    //   user_name:'xavijam',
+	    //   table_name: 'test2',
+	    //   query: "SELECT cartodb_id,the_geom_webmercator,description FROM test2",
+	    //   tile_style: "#test2{line-color:#719700;line-width:1;line-opacity:0.6;polygon-opacity:0.6;}",
+	    //   map_key: "6087bc5111352713a81a48491078f182a0541f6c",
+	    //   infowindow: "SELECT cartodb_id,the_geom_webmercator,description FROM test2 WHERE cartodb_id={{feature}}",
+	    //   auto_bound: true,
+	    //   debug: true
+	    // });
 
 	    cartodb_leaflet2 = new L.CartoDBLayer({
 	      map_canvas: 'map_canvas',
 	      map: map,
-	      user_name:'xavijam',
-	      table_name: 'points',
-	      query: "SELECT cartodb_id,the_geom_webmercator,description FROM points",
-	      map_key: "6087bc5111352713a81a48491078f182a0541f6c",
+	      user_name:'viz2',
+	      table_name: 'wifi',
+	      query: "SELECT cartodb_id,type,the_geom_webmercator,name FROM wifi",
 	      infowindow: true,
-	      auto_bound: false,
-	      debug: true
+	      auto_bound: true,
+	      debug: false
 	    });
 
 	  }
