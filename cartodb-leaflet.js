@@ -80,7 +80,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	  // Add cartodb tiles to the map
 	  function addSimpleCartoDBTiles(params) {
 		  // Add the cartodb tiles
-		  var cartodb_url = 'http://' + params.user_name + '.cartodb.com/tiles/' + params.table_name + '/{z}/{x}/{y}.png?sql=' + params.query +
+		  var cartodb_url = 'http://' + params.user_name + '.cartodb.com/tiles/' + params.table_name + '/{z}/{x}/{y}.png?sql=' + encodeURIComponent(params.query) +
 		  	'&map_key=' + (params.map_key || '') + '&style=' + ((params.tile_style)?encodeURIComponent(params.tile_style):'')
 		  	, cartodb_layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB'});
 
@@ -123,12 +123,12 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     function generateTileJson() {
       var core_url = 'http://' + params.user_name + '.cartodb.com';  
       var base_url = core_url + '/tiles/' + params.table_name + '/{z}/{x}/{y}';
-      var tile_url = base_url + '.png?';
+      var tile_url = base_url + '.png';
       var grid_url = base_url + '.grid.json';
       
       // SQL?
       if (params.query) {
-        var query = 'sql=' + params.query;
+        var query = 'sql=' + encodeURIComponent(params.query);
         tile_url = wax.util.addUrlData(tile_url, query);
         grid_url = wax.util.addUrlData(grid_url, query);
       }
