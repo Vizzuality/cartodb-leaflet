@@ -5,7 +5,7 @@
  * @fileoverview <b>Author:</b> xavijam@gmail.com<br/> <b>Licence:</b>
  *               Licensed under <a
  *               href="http://opensource.org/licenses/mit-license.php">MIT</a>
- *               license.<br/> This library lets you use CartoDB with Leaflet.
+ *               license.<br/> This library lets you to use CartoDB with Leaflet.
  *                 
  */
  
@@ -71,16 +71,20 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	        }
 	      },
 	      error: function(e,msg) {
-	        params.debug && console.debug('Error setting table bounds: ' + msg);
+	        if (params.debug) throw('Error getting table bounds: ' + msg);
 	      }
 	    });
 	  }
 	  
 	  // Add cartodb tiles to the map
 	  function addSimpleCartoDBTiles(params) {
+
+	  	// Then add the cartodb tiles
+      var tile_style = (params.tile_style)? encodeURIComponent(params.tile_style.replace(/\{\{table_name\}\}/g,params.table_name)) : ''
+        , query = encodeURIComponent(params.query.replace(/\{\{table_name\}\}/g,params.table_name));
+
 		  // Add the cartodb tiles
-		  var cartodb_url = 'http://' + params.user_name + '.cartodb.com/tiles/' + params.table_name + '/{z}/{x}/{y}.png?sql=' + encodeURIComponent(params.query) +
-		  	'&map_key=' + (params.map_key || '') + '&style=' + ((params.tile_style)?encodeURIComponent(params.tile_style):'')
+		  var cartodb_url = 'http://' + params.user_name + '.cartodb.com/tiles/' + params.table_name + '/{z}/{x}/{y}.png?sql=' + query +'&style=' + tile_style
 		  	, cartodb_layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB'});
 
 		  params.layer = cartodb_layer;
@@ -90,7 +94,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	  // Add cartodb tiles to the map
 	  function addWaxCartoDBTiles(params) {
       // interaction placeholder
-      params.tilejson = generateTileJson();
+      params.tilejson = generateTileJson(params);
 
 			params.waxOptions = {
         callbacks: {
@@ -119,7 +123,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     // Generate tile json for wax
-    function generateTileJson() {
+    function generateTileJson(params) {
       var core_url = 'http://' + params.user_name + '.cartodb.com';  
       var base_url = core_url + '/tiles/' + params.table_name + '/{z}/{x}/{y}';
       var tile_url = base_url + '.png';
@@ -127,14 +131,14 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       
       // SQL?
       if (params.query) {
-        var query = 'sql=' + encodeURIComponent(params.query);
+        var query = 'sql=' + encodeURIComponent(params.query.replace(/\{\{table_name\}\}/g,params.table_name));
         tile_url = wax.util.addUrlData(tile_url, query);
         grid_url = wax.util.addUrlData(grid_url, query);
       }
 
       // STYLE?
       if (params.tile_style) {
-        var style = 'style=' + encodeURIComponent(params.tile_style);
+        var style = 'style=' + encodeURIComponent(params.tile_style.replace(/\{\{table_name\}\}/g,params.table_name));
         tile_url = wax.util.addUrlData(tile_url, style);
         grid_url = wax.util.addUrlData(grid_url, style);
       }
@@ -163,13 +167,23 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	  
 
 	  // Update tiles & interactivity layer;
-    L.CartoDBLayer.prototype.update = function(sql) {
-    	this.params.query = sql;
+    L.CartoDBLayer.prototype.update = function(param,value) {
 
       // Hide the infowindow
       if (this.params.popup) 
         this.params.popup._close();
-      
+
+			// What do we support change? - tile_style | query | infowindow
+      if (param != "tile_style" && param != "query" && param != "infowindow") {
+      	if (this.params.debug) {
+      		throw("Sorry, you can't update this parameter");
+      	} else {
+      		return false;
+      	}
+      } else {
+      	this.params[param] = value;
+      }
+
       // Destroy layer
       this.destroy();
 
@@ -342,9 +356,11 @@ L.CartoDBInfowindow = L.Class.extend({
 
 		// If the table is private, you can't run any api methods
     if (this.options.infowindow!=true) {
-      infowindow_sql = encodeURIComponent(this.options.infowindow.replace('{{feature}}',this._feature));
+      infowindow_sql = this.options.infowindow.replace('{{feature}}',this._feature);
     }
-      
+
+    // Replace {{table_name}} for table name
+    infowindow_sql = encodeURIComponent(infowindow_sql.replace(/\{\{table_name\}\}/g,this.options.table_name));
 
     $.ajax({
 	    url:'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+infowindow_sql,
@@ -360,7 +376,7 @@ L.CartoDBInfowindow = L.Class.extend({
 				that._open();
 			},
     	error: function(e, msg) {
-      	that.params_.debug && console.debug('Error retrieving infowindow variables: ' + msg)
+    		if (that.options.debug) throw('Error retrieving infowindow variables: ' + msg);
       }
     });
 	},
