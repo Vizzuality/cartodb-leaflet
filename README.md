@@ -78,36 +78,37 @@ Using the library is really easy. It accepts the following parameters to manage 
 If you choose a CartoDB private table you'll need to [authenticate](http://developers.cartodb.com/api/authentication.html) beforehand. If you want to show specific columns in the info window (via the `infowindow` parameter), the columns must be in a query using `WHERE` clauses. Keep in mind the `cartodb_id` and `the_geom_webmercator` columns are required.
 
 
-Example
--------
+# Example
+
+Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/)!
+
 First of all create your map:
 
 ```javascript
-	var map = new L.Map('map_canvas');
-	var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
-			map.addLayer(cloudmade);
+var map = new L.Map('map_canvas');
+var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+	cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+	cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
+map.addLayer(cloudmade);
 ```
   
 And then add the cartodb layer:
 
 ```javascript
-	var cartodb_leaflet = new L.CartoDBLayer({
-  	map_canvas: 'map_canvas',
-  	map: map,
-  	user_name:'example',
-  	table_name: 'earthquakes',
-  	query: "SELECT * FROM {{table_name}}",
-    tile_style: "#{{table_name}}{marker-fill:red}",
-  	infowindow: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
-  	auto_bound: true
-  });
+var cartodb_leaflet = new L.CartoDBLayer({
+  map_canvas: 'map_canvas',
+  map: map,
+  user_name:'example',
+  table_name: 'earthquakes',
+  query: "SELECT * FROM {{table_name}}",
+  tile_style: "#{{table_name}}{marker-fill:red}",
+  infowindow: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
+  auto_bound: true
+});
 ```
 
 
-Functions
----------
+# Functions
 New funcionalities are coming, in the meantime you can use:
 
 * update: It needs a parameter and a new value to work. Example: cartodb_leaflet.update('query','SELECT * FROM earthquakes WHERE cartodb_id>2');
@@ -115,6 +116,3 @@ New funcionalities are coming, in the meantime you can use:
 * hide: Hide the cartodb layer from the map (For now, hide and destroy are the same, but will be replace in the future).
 * show: Show again the cartodb layer in the map. Example: cartodb_leaflet.show();
 * isVisible: Returns if cartodb layer is visible or not. Example: cartodb_leaflet.isVisible(); -> true | false
-
-
-[live example](http://vizzuality.github.com/cartodb-leaflet/)

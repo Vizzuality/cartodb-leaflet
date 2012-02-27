@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet for Leaflet
- * @version 0.1 [November 3, 2011]
+ * @version 0.3 [February 27, 2012]
  * @author: xavijam@gmail.com
  * @fileoverview <b>Author:</b> xavijam@gmail.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -19,7 +19,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
    *   	user_name 		-		 	CartoDB user name
    *   	table_name 		-			CartoDB table name
    *    query					-			If you want to apply any sql sentence to the table...
-   * 		map_key				-			If your table is private, you'll need the map_key parameter
    * 		tile_style		-			If you want to add other style to the layer
    *		infowindow		-			If you want to see infowindows when click in a geometry (opcional - default = false)
    *		auto_bound		-			Let cartodb auto-bound-zoom in the map (opcional - default = false)
@@ -133,13 +132,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         grid_url = wax.util.addUrlData(grid_url, query);
       }
 
-      // MAP KEY?
-      if (params.map_key) {
-        var map_key = 'map_key=' + params.map_key;
-        tile_url = wax.util.addUrlData(tile_url, map_key);
-        grid_url = wax.util.addUrlData(grid_url, map_key);
-      }
-
       // STYLE?
       if (params.tile_style) {
         var style = 'style=' + encodeURIComponent(params.tile_style);
@@ -234,6 +226,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     };
   };
 }
+
+
 
 
 ////////////////////////

@@ -18,7 +18,7 @@
   		, cartodb_leaflet2;
 
 	  function initialize() {
-			var map = new L.Map('map_canvas');
+			var map = new L.Map('map_canvas').setView(new L.LatLng(20, 0), 3);
 			var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
 	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
@@ -27,26 +27,24 @@
 	    cartodb_leaflet1 = new L.CartoDBLayer({
 	      map_canvas: 'map_canvas',
 	      map: map,
-	      user_name:'xavijam',
-	      table_name: 'test2',
-	      query: "SELECT cartodb_id,the_geom_webmercator,description FROM test2",
-	      tile_style: "#test2{line-color:#719700;line-width:1;line-opacity:0.6;polygon-opacity:0.6;}",
-	      map_key: "6087bc5111352713a81a48491078f182a0541f6c",
-	      infowindow: "SELECT cartodb_id,the_geom_webmercator,description FROM test2 WHERE cartodb_id={{feature}}",
-	      auto_bound: true,
+	      user_name:'examples',
+	      table_name: 'country_colors',
+	      query: "SELECT * FROM {{table_name}}",
+	      infowindow: false,
+	      auto_bound: false,
 	      debug: true
 	    });
 
 	    cartodb_leaflet2 = new L.CartoDBLayer({
 	      map_canvas: 'map_canvas',
 	      map: map,
-	      user_name:'xavijam',
-	      table_name: 'points',
-	      query: "SELECT cartodb_id,the_geom_webmercator,description FROM points",
-	      map_key: "6087bc5111352713a81a48491078f182a0541f6c",
-	      infowindow: true,
+	      user_name:"examples",
+	      table_name: 'earthquakes',
+	      query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
+	      tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
+	      infowindow: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
 	      auto_bound: false,
-	      debug: true
+	      debug: false
 	    });
 	  }
   </script>
