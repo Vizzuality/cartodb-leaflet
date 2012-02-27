@@ -188,7 +188,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       this.destroy();
 
       // Add new one updated
-      if (this.params.popup)
+      if (this.params.infowindow)
 			  addWaxCartoDBTiles(this.params)
 			else
 			  addSimpleCartoDBTiles(this.params);
