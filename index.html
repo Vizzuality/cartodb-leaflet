@@ -5,11 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
   <title>Using CartoDB with Leaflet</title>
   <link rel="shortcut icon" href="http://cartodb.com/favicon/favicon_32x32.ico" />
-  <link href="leaflet.css" rel="stylesheet" type="text/css" />
-  <link href="leaflet.ie.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+  <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
   <link  href="cartodb.css" rel="stylesheet" type="text/css">
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="leaflet.js"></script>
+  <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
   <script type="text/javascript" src="wax.leaflet.min.js"></script>
   <script type="text/javascript" src="cartodb-leaflet.js"></script>
 
@@ -18,12 +18,13 @@
   		, cartodb_leaflet2;
 
 	  function initialize() {
-			var map = new L.Map('map_canvas').setView(new L.LatLng(20, 0), 3);
+			var map = new L.Map('map_canvas').setView(new L.LatLng(20,0), 3);
+
 			var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
 	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
 			map.addLayer(cloudmade);
-	
+
 	    cartodb_leaflet1 = new L.CartoDBLayer({
 	      map_canvas: 'map_canvas',
 	      map: map,

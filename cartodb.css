@@ -1,5 +1,5 @@
 /*other stuff*/
-html, body {height: 100%; margin: 0; padding: 0;}
+html, body {height: 100%; margin: 0; padding: 0; overflow:hidden;}
 #map_canvas {height: 100%;}
 
 /*Marker infowindow*/
@@ -15,7 +15,6 @@ div.leaflet-popup div.leaflet-popup-content label {display:block; width:auto; pa
 div.leaflet-popup div.leaflet-popup-content p {display:block; width:170px; max-height:20px; padding:2px 4px; margin:2px 0 7px; font:bold 11px 'Helvetica',Arial; color:#666666; border:none; background:none; text-shadow:0 1px white;
   text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 div.leaflet-popup div.leaflet-popup-content p.empty {font-weight:normal; font-style:italic; color:#b7b7b7;}
-/*div.cartodb_infowindow div.top p:focus {border:1px solid #666666; border-radius:5px; -webkit-border-radius:5px; -moz-border-radius:5px;}*/
 div.leaflet-popup div.leaflet-popup-tip-container {width:180px; height:36px; padding:11px 16px 10px 10px; margin:0; background:url('sprite.png') no-repeat right top;}
 div.leaflet-popup div.leaflet-popup-tip-container label {float:left; margin:5px 0 0 3px; font:normal 11px Arial; color:#B3B3B3; text-shadow:0 1px white}
 div.leaflet-popup div.leaflet-popup-tip-container label strong {font:bold 11px 'Helvetica',Arial; color:#666666; text-shadow:0 1px white;}

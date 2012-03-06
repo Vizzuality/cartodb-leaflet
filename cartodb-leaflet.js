@@ -159,16 +159,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       };
     }
    
-   	// Function to transform GeoJSON to Leaflet coordinates 
-    function transformGeoJSON(str) {
-	    var json = JSON.parse(str);
-	    return new L.LatLng(json.coordinates[1],json.coordinates[0]);
-	  }
-	  
+
 
 	  // Update tiles & interactivity layer;
     L.CartoDBLayer.prototype.update = function(param,value) {
-
       // Hide the infowindow
       if (this.params.popup) 
         this.params.popup._close();
@@ -361,6 +355,7 @@ L.CartoDBInfowindow = L.Class.extend({
 
     // Replace {{table_name}} for table name
     infowindow_sql = encodeURIComponent(infowindow_sql.replace(/\{\{table_name\}\}/g,this.options.table_name));
+
 
     $.ajax({
 	    url:'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+infowindow_sql,
