@@ -79,6 +79,8 @@ If you choose a CartoDB private table you'll need to [authenticate](http://devel
 
 If you don't want to write the name of the table several times, you can use {{table_name}} in the `query`, `tile_style` and `infowindow` parameters. {{feature}} is required in the `infowindow` paramenter when you want to show specific information on it.
 
+We strongly recommend the use of the files available in this repository. These are tested, and if you decide use updated ones, the library could not work.
+
 # Example
 
 Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/)!
