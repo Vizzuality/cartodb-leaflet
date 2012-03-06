@@ -77,7 +77,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 If you choose a CartoDB private table you'll need to [authenticate](http://developers.cartodb.com/api/authentication.html) beforehand. If you want to show specific columns in the info window (via the `infowindow` parameter), the columns must be in a query using `WHERE` clauses. Keep in mind the `cartodb_id` and `the_geom_webmercator` columns are required.
 
-If you don't want to write the name of the table several times, you can use {{table_name}} in the query, tile_style and infowindow parameters. {{feature}} is required in the infowindow paramenter when you want to show specific information on it.
+If you don't want to write the name of the table several times, you can use {{table_name}} in the `query`, `tile_style` and `infowindow` parameters. {{feature}} is required in the `infowindow` paramenter when you want to show specific information on it.
 
 # Example
 
