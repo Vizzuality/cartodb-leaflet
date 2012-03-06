@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet for Leaflet
- * @version 0.3 [February 27, 2012]
+ * @version 0.31 [March 6, 2012]
  * @author: xavijam@gmail.com
  * @fileoverview <b>Author:</b> xavijam@gmail.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -162,21 +162,33 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
 	  // Update tiles & interactivity layer;
-    L.CartoDBLayer.prototype.update = function(param,value) {
+    L.CartoDBLayer.prototype.update = function(changes) {
       // Hide the infowindow
       if (this.params.popup) 
         this.params.popup._close();
 
 			// What do we support change? - tile_style | query | infowindow
-      if (param != "tile_style" && param != "query" && param != "infowindow") {
-      	if (this.params.debug) {
-      		throw("Sorry, you can't update this parameter");
+			if (typeof changes == 'object') {
+				for (var param in changes) {
+
+	      	if (param != "tile_style" && param != "query" && param != "infowindow") {
+		      	if (this.params.debug) {
+		      		throw("Sorry, you can't update " + param);
+		      	} else {
+		      		return;
+		      	}
+		      } else {
+		      	this.params[param] = changes[param];
+		      }					
+				}
+
+			} else {
+				if (this.params.debug) {
+      		throw("This method only accepts a javascript object");
       	} else {
-      		return false;
+      		return;
       	}
-      } else {
-      	this.params[param] = value;
-      }
+			}
 
       // Destroy layer
       this.destroy();
@@ -355,7 +367,6 @@ L.CartoDBInfowindow = L.Class.extend({
 
     // Replace {{table_name}} for table name
     infowindow_sql = encodeURIComponent(infowindow_sql.replace(/\{\{table_name\}\}/g,this.options.table_name));
-
 
     $.ajax({
 	    url:'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+infowindow_sql,
