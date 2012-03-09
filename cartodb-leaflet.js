@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet for Leaflet
- * @version 0.31 [March 6, 2012]
+ * @version 0.32 [March 9, 2012]
  * @author: xavijam@gmail.com
  * @fileoverview <b>Author:</b> xavijam@gmail.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -105,8 +105,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	          $('body').css({cursor:'pointer'});
           },
           click: function(feature, div, op3, evt) {
-	          var container_point = params.map.containerPointToLayerPoint(new L.Point(evt.clientX,evt.clientY));
-	          var latlng = params.map.layerPointToLatLng(container_point);
+	          var container_point = params.map.mouseEventToContainerPoint(evt)
+	          	, latlng = params.map.layerPointToLatLng(container_point);
 	          params.popup.setLatLng(latlng);
 						params.popup.setContent(feature);
 						params.map.openPopup(params.popup);
