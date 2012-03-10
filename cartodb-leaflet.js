@@ -88,7 +88,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 		  	, cartodb_layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB'});
 
 		  params.layer = cartodb_layer;
-			params.map.addLayer(cartodb_layer);
+			params.map.addLayer(cartodb_layer,false);
 	  }
 	  
 	  // Add cartodb tiles to the map
@@ -105,8 +105,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	          $('body').css({cursor:'pointer'});
           },
           click: function(feature, div, op3, evt) {
-	          var container_point = params.map.mouseEventToContainerPoint(evt)
+	          var container_point = params.map.mouseEventToLayerPoint(evt)
 	          	, latlng = params.map.layerPointToLatLng(container_point);
+
 	          params.popup.setLatLng(latlng);
 						params.popup.setContent(feature);
 						params.map.openPopup(params.popup);
@@ -116,7 +117,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       };
 
 			params.layer = new wax.leaf.connector(params.tilejson);
-      params.map.addLayer(params.layer);
+      params.map.addLayer(params.layer,false);
      	params.interaction = wax.leaf.interaction(params.map, params.tilejson, params.waxOptions);
      	params.popup = new L.CartoDBInfowindow(params);
 	  }

@@ -20,11 +20,6 @@
 	  function initialize() {
 			var map = new L.Map('map_canvas').setView(new L.LatLng(20,0), 3);
 
-			var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
-			map.addLayer(cloudmade);
-
 	    cartodb_leaflet1 = new L.CartoDBLayer({
 	      map_canvas: 'map_canvas',
 	      map: map,
@@ -47,6 +42,11 @@
 	      auto_bound: false,
 	      debug: false
 	    });
+
+	    var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
+			map.addLayer(cloudmade,true);
 	  }
   </script>
 </head>
