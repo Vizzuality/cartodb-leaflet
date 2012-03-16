@@ -20,6 +20,10 @@
 	  function initialize() {
 			var map = new L.Map('map_canvas').setView(new L.LatLng(20,0), 3);
 
+			map.on("layeradd",function(ev) {
+				bindLayers(ev.layer);
+			});
+
 	    cartodb_leaflet1 = new L.CartoDBLayer({
 	      map_canvas: 'map_canvas',
 	      map: map,
@@ -46,12 +50,55 @@
 	    var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
 	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
+
 			map.addLayer(cloudmade,true);
+
+			map.on('dragstart',showLoader);
 	  }
+
+
+	  function bindLayers(layer) {
+	  	//for (var i in map._layers) {
+  		layer.on('load',function(ev){
+
+				// Set to true
+				ev.target._loaded = true;
+
+				var map_layers = ev.target._map._layers
+					, length = Object.keys(map_layers).length
+					, count = 0;
+
+				for (var i in map_layers) {
+					if (map_layers[i]['_loaded']) {
+						count++;
+					}
+				}
+
+				if (count == length) {
+				 	hideLoader();
+				}
+			});
+
+			layer.on('loading',function(ev){
+				showLoader();
+			});
+	  }
+
+
+	  function showLoader() {
+	  	$('div.loader').stop(true).fadeTo(300,1);
+	  }
+
+
+	  function hideLoader() {
+	  	$('div.loader').fadeTo(300,0);
+	  }
+
   </script>
 </head>
 <body onload="initialize()">
   <div id="map_canvas"></div>
   <a class="cartodb_logo" href="http://www.cartodb.com" target="_blank">CartoDB</a>
+  <div class="loader">Loading...</div>
 </body>
 </html>
