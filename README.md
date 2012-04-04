@@ -21,7 +21,7 @@ Html(*):
 <script type="text/javascript" src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
 <script type="text/javascript" src="wax.leaflet.min.js"></script>
 <script type="text/javascript" src="cartodb-leaflet.js"></script>
-´´´
+```
 * We strongly recommend to use the library files we have in this repository, they are fully tested.
 
 
