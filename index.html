@@ -4,11 +4,10 @@
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
   <title>Using CartoDB with Leaflet</title>
-  <link rel="shortcut icon" href="http://cartodb.com/favicon/favicon_32x32.ico" />
+  <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
   <link  href="cartodb.css" rel="stylesheet" type="text/css">
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
   <script type="text/javascript" src="wax.leaflet.min.js"></script>
   <script type="text/javascript" src="cartodb-leaflet.js"></script>
@@ -26,7 +25,7 @@
 	      user_name:'examples',
 	      table_name: 'country_colors',
 	      query: "SELECT * FROM {{table_name}}",
-	      infowindow: false,
+	      infowindow: true,
 	      auto_bound: false,
 	      debug: true
 	    });
@@ -52,6 +51,5 @@
 </head>
 <body onload="initialize()">
   <div id="map_canvas"></div>
-  <a class="cartodb_logo" href="http://www.cartodb.com" target="_blank">CartoDB</a>
 </body>
 </html>

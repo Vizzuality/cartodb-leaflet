@@ -3,6 +3,29 @@
 
 This library allows you to use your own CartoDB tables with Laeflet.
 
+
+# Creating an example
+
+You will need to load these files to run the library:
+
+  - [Leaflet library](http://github.com/CloudMade/Leaflet/blob/master/dist/leaflet.js)
+  - [Leaflet css theme](http://github.com/CloudMade/Leaflet/tree/master/dist/leaflet.css)
+  - [Wax for Leaflet](http://mapbox.com/wax/) 
+  - [CartoDB library for Leaflet](https://github.com/Vizzuality/cartodb-leaflet/blob/gh-pages/cartodb-leaflet.js)
+
+Html(*):
+
+```html
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
+<script type="text/javascript" src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+<script type="text/javascript" src="wax.leaflet.min.js"></script>
+<script type="text/javascript" src="cartodb-leaflet.js"></script>
+´´´
+* We strongly recommend to use the library files we have in this repository, they are fully tested.
+
+
+
 # Using the library
 
 Using the library is really easy. It accepts the following parameters to manage the behavior of your CartoDB layers:
@@ -44,7 +67,6 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>A SQL query.</td>
 <td>Yes</td>
 </tr>
-
 
 <tr>
 <td>infowindow</td>
