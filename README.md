@@ -69,6 +69,12 @@ Using the library is really easy. It accepts the following parameters to manage 
 </tr>
 
 <tr>
+<td>opacity</td>
+<td>If you want to change the opacity of the CartoDB layer.</td>
+<td>No</td>
+</tr>
+
+<tr>
 <td>infowindow</td>
 <td>If you want to add interactivity to the layer, showing the info window.</td>
 <td>No</td>
@@ -117,7 +123,7 @@ var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D7597
 map.addLayer(cloudmade);
 ```
   
-And then add the cartodb layer:
+And then add the CartoDB layer:
 
 ```javascript
 var cartodb_leaflet = new L.CartoDBLayer({
@@ -137,6 +143,11 @@ var cartodb_leaflet = new L.CartoDBLayer({
 New funcionalities are coming, in the meantime you can use:
 
 * update: It needs a parameter and a new value to work. Example: cartodb_leaflet.update({'query':'SELECT * FROM earthquakes WHERE cartodb_id>2'});
+    Accepted values:
+      - query
+      - opacity
+      - tile_style
+      - infowindow
 * destroy: Removes the cartodb layer from the map. Example: cartodb_leaflet.destroy();
 * hide: Hide the cartodb layer from the map (For now, hide and destroy are the same, but will be replace in the future).
 * show: Show again the cartodb layer in the map. Example: cartodb_leaflet.show();

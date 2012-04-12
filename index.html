@@ -37,13 +37,14 @@
 	      table_name: 'earthquakes',
 	      query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
 	      tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
+        opacity: 0.8,
 	      infowindow: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
 	      auto_bound: true,
 	      debug: false
 	    });
 
 	    var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-	    cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+	    cloudmadeAttrib = 'Map data &copy; 2012 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
 	    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
 			map.addLayer(cloudmade,true);
 	  }
