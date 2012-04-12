@@ -10,7 +10,7 @@ You will need to load these files to run the library:
 
   - [Leaflet library](http://github.com/CloudMade/Leaflet/blob/master/dist/leaflet.js)
   - [Leaflet css theme](http://github.com/CloudMade/Leaflet/tree/master/dist/leaflet.css)
-  - [Wax for Leaflet](http://mapbox.com/wax/) 
+  - [Wax for Leaflet](https://github.com/mapbox/wax) 
   - [CartoDB library for Leaflet](https://github.com/Vizzuality/cartodb-leaflet/blob/gh-pages/cartodb-leaflet.js)
 
 Html(*):
@@ -19,7 +19,7 @@ Html(*):
 <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
 <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
 <script type="text/javascript" src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-<script type="text/javascript" src="wax.leaflet.min.js"></script>
+<script type="text/javascript" src="wax.leaf.min-6.0.0-beta2.js"></script>
 <script type="text/javascript" src="cartodb-leaflet.js"></script>
 ```
 * We strongly recommend to use the library files we have in this repository, they are fully tested.

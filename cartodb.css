@@ -18,4 +18,4 @@ div.leaflet-popup div.leaflet-popup-content p.empty {font-weight:normal; font-st
 div.leaflet-popup div.leaflet-popup-tip-container {width:180px; height:36px; padding:11px 16px 10px 10px; margin:0; background:url('sprite.png') no-repeat right top;}
 div.leaflet-popup div.leaflet-popup-tip-container label {float:left; margin:5px 0 0 3px; font:normal 11px Arial; color:#B3B3B3; text-shadow:0 1px white}
 div.leaflet-popup div.leaflet-popup-tip-container label strong {font:bold 11px 'Helvetica',Arial; color:#666666; text-shadow:0 1px white;}
-a.cartodb_logo {position:absolute; bottom:8px; left:8px; display:block; width:69px; height:27px; background:url('http://cartodb.s3.amazonaws.com/embed/embed_sprite.png') no-repeat -61px 0; text-indent:-9999px; line-height:0; font-size:0;}
+a#cartodb_logo {position:absolute; bottom:8px; left:8px; display:block; width:71px; height:29px; background:url('http://cartodb.s3.amazonaws.com/static/new_logo.png') no-repeat 0 0; text-indent:-9999px; line-height:0; font-size:0; text-transform:uppercase;}

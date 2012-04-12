@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet for Leaflet
- * @version 0.33 [April 4, 2012]
+ * @version 0.34 [April 12, 2012]
  * @author: xavijam@gmail.com
  * @fileoverview <b>Author:</b> xavijam@gmail.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -33,7 +33,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     if (this.params.infowindow) {
 		  addWaxCartoDBTiles(this.params)
 		} else {
-		  addSimpleCartoDBTiles(this.params);											// Always add cartodb tiles, simple or with wax.
+		  addSimpleCartoDBTiles(this.params);											// Always add cartodb tiles, simple or with interaction.
 		}
 
     addCartodb();
@@ -56,18 +56,31 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 	          var coor1 = coordinates[0].split(' ');
 	          var coor2 = coordinates[1].split(' ');
 
-	          // Check bounds
-	          if (coor1[0] >  180 || coor1[0] < -180 || coor1[1] >  90 || coor1[1] < -90 
-	            || coor2[0] >  180 || coor2[0] < -180 || coor2[1] >  90  || coor2[1] < -90) {
-	            coor1[0] = '-30';
-	            coor1[1] = '-50'; 
-	            coor2[0] = '110'; 
-	            coor2[1] =  '80'; 
-	          }
+	          var lon0 = coor1[0];
+            var lat0 = coor1[1];
+            var lon1 = coor2[0];
+            var lat1 = coor2[1];
 
-	          var pos1 = new L.LatLng(parseFloat(coor1[1]),parseFloat(coor1[0]));
-	  				var pos2 = new L.LatLng(parseFloat(coor2[1]),parseFloat(coor2[0]));
-	  				var bounds = new L.LatLngBounds(pos1,pos2);
+            // Check bounds
+
+            var minlat = -85.0511;
+            var maxlat =  85.0511;
+            var minlon = -179;
+            var maxlon =  179;
+
+            /* Clamp X to be between min and max (inclusive) */
+            var clampNum = function(x, min, max) {
+              return x < min ? min : x > max ? max : x;
+            }
+
+            lon0 = clampNum(lon0, minlon, maxlon);
+            lon1 = clampNum(lon1, minlon, maxlon);
+            lat0 = clampNum(lat0, minlat, maxlat);
+            lat1 = clampNum(lat1, minlat, maxlat);
+
+            var sw = new L.LatLng(lat0, lon0);
+            var ne = new L.LatLng(lat1, lon1);
+	  				var bounds = new L.LatLngBounds(sw,ne);
 	        	params.map.fitBounds(bounds);
 	        }
 	      },
@@ -79,14 +92,18 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
     // Add Cartodb logo :)
     function addCartodb() {
-      var cartodb_link = document.createElement("a");
-      cartodb_link.setAttribute('class','cartodb_logo');
-      cartodb_link.setAttribute('href','http://www.cartodb.com');
-      cartodb_link.setAttribute('target','_blank');
-      cartodb_link.innerHTML = "CartoDB";
-      document.body.appendChild(cartodb_link);
+      // If the logo is already added, don't continue
+      if (!document.getElementById('cartodb_logo')) {
+        var cartodb_link = document.createElement("a");
+        cartodb_link.setAttribute('id','cartodb_logo');
+        cartodb_link.setAttribute('href','http://www.cartodb.com');
+        cartodb_link.setAttribute('target','_blank');
+        cartodb_link.innerHTML = "CartoDB";
+        document.body.appendChild(cartodb_link);  
+      }      
     }
 	  
+
 	  // Add cartodb tiles to the map
 	  function addSimpleCartoDBTiles(params) {
 
@@ -102,20 +119,21 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 			params.map.addLayer(cartodb_layer,false);
 	  }
 	  
+
 	  // Add cartodb tiles to the map
 	  function addWaxCartoDBTiles(params) {
       // interaction placeholder
       params.tilejson = generateTileJson(params);
 
-			params.waxOptions = {
-        callbacks: {
-          out: function(){
+			params.eventType = {
+          mouseout: function(){
             document.body.style.cursor = "default";
           },
-          over: function(feature, div, opt3, evt){
+          mouseover: function(feature, div, opt3, evt){
 	          document.body.style.cursor = "pointer";
           },
-          click: function(feature, div, op3, evt) {
+          mouseup: function(feature, div, op3, evt) {
+            console.log(feature,div,op3,evt);
 	          var container_point = params.map.mouseEventToLayerPoint(evt)
 	          	, latlng = params.map.layerPointToLatLng(container_point);
 
@@ -123,13 +141,32 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 						params.popup.setContent(feature);
 						params.map.openPopup(params.popup);
           }
-        },
-        clickAction: 'location'
       };
 
 			params.layer = new wax.leaf.connector(params.tilejson);
       params.map.addLayer(params.layer,false);
-     	params.interaction = wax.leaf.interaction(params.map, params.tilejson, params.waxOptions);
+     	params.interaction = wax.leaf.interaction()
+        .map(params.map)
+        .tilejson(params.tilejson)
+        .on('on', function(o){
+          switch (o.e.type) {            
+            case 'mousemove':   document.body.style.cursor = "pointer";
+                                break;
+            case 'mouseup':     var container_point = params.map.mouseEventToLayerPoint(o.e)
+                                  , latlng = params.map.layerPointToLatLng(container_point);
+
+                                params.popup.setLatLng(latlng);
+                                params.popup.setContent(o.data.cartodb_id);
+                                params.map.openPopup(params.popup);
+
+                                break;
+            default:            break;
+          }
+        })
+        .on('off', function(o){
+          document.body.style.cursor = "default"; 
+        });
+
      	params.popup = new L.CartoDBInfowindow(params);
 	  }
 
@@ -144,15 +181,15 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       // SQL?
       if (params.query) {
         var query = 'sql=' + encodeURIComponent(params.query.replace(/\{\{table_name\}\}/g,params.table_name));
-        tile_url = wax.util.addUrlData(tile_url, query);
-        grid_url = wax.util.addUrlData(grid_url, query);
+        tile_url = addUrlData(tile_url, query);
+        grid_url = addUrlData(grid_url, query);
       }
 
       // STYLE?
       if (params.tile_style) {
         var style = 'style=' + encodeURIComponent(params.tile_style.replace(/\{\{table_name\}\}/g,params.table_name));
-        tile_url = wax.util.addUrlData(tile_url, style);
-        grid_url = wax.util.addUrlData(grid_url, style);
+        tile_url = addUrlData(tile_url, style);
+        grid_url = addUrlData(grid_url, style);
       }
       
       // Build up the tileJSON
@@ -170,6 +207,40 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         }
       };
     }
+
+
+    function parseUri(str) {
+        var o = {
+            strictMode: false,
+            key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+            q:   {
+                name:   "queryKey",
+                parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+            },
+            parser: {
+                strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+                loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+            }
+        },
+            m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+            uri = {},
+            i   = 14;
+
+        while (i--) uri[o.key[i]] = m[i] || "";
+
+        uri[o.q.name] = {};
+        uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+            if ($1) uri[o.q.name][$1] = $2;
+        });
+        return uri;
+    }
+
+    // appends callback onto urls regardless of existing query params
+    function addUrlData(url, data) {
+        url += (parseUri(url).query) ? '&' : '?';
+        return url += data;
+    }
+
    
 
 

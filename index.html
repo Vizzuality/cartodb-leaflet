@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
   <link  href="cartodb.css" rel="stylesheet" type="text/css">
   <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-  <script type="text/javascript" src="wax.leaflet.min.js"></script>
+  <script type="text/javascript" src="wax.leaf.min-6.0.0-beta2.js"></script>
   <script type="text/javascript" src="cartodb-leaflet.js"></script>
 
   <script type="text/javascript">
@@ -38,7 +38,7 @@
 	      query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
 	      tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
 	      infowindow: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
-	      auto_bound: false,
+	      auto_bound: true,
 	      debug: false
 	    });
 
