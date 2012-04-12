@@ -123,7 +123,7 @@ var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D7597
 map.addLayer(cloudmade);
 ```
   
-And then add the CartoDB layer:
+Then create the CartoDB layer:
 
 ```javascript
 var cartodb_leaflet = new L.CartoDBLayer({
@@ -138,17 +138,25 @@ var cartodb_leaflet = new L.CartoDBLayer({
 });
 ```
 
+And finally add it to the map:
+
+```javascript
+map.addLayer(cartodb_leaflet);
+```
+
 
 # Functions
 New funcionalities are coming, in the meantime you can use:
 
-* update: It needs a parameter and a new value to work. Example: cartodb_leaflet.update({'query':'SELECT * FROM earthquakes WHERE cartodb_id>2'});
-    Accepted values:
-      - query
-      - opacity
-      - tile_style
-      - infowindow
-* destroy: Removes the cartodb layer from the map. Example: cartodb_leaflet.destroy();
-* hide: Hide the cartodb layer from the map (For now, hide and destroy are the same, but will be replace in the future).
+
+* removeLayer: Removes the cartodb layer from the map.
+    Example: ```javascript map.removeLayer(cartodb_leaflet);```
+* hide: Hide the cartodb layer from the map.
+    Example: ```javascript map.removeLayer(cartodb_leaflet);```
 * show: Show again the cartodb layer in the map. Example: cartodb_leaflet.show();
-* isVisible: Returns if cartodb layer is visible or not. Example: cartodb_leaflet.isVisible(); -> true | false
+* setInteraction: Set the interaction of your layer to true or false. Example: cartodb_leaflet.setInteraction(false);
+* setOpacity: Change the opacity of the CartoDB layer. Example: cartodb_leaflet.setOpacity(0.3);
+* setQuery:
+* setStyle:
+* setInfowindow:
+* setLayerOrder: **Not available yet** Waiting for this ticket: https://github.com/CloudMade/Leaflet/issues/505
