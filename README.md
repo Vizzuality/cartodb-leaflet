@@ -149,14 +149,20 @@ map.addLayer(cartodb_leaflet);
 New funcionalities are coming, in the meantime you can use:
 
 
-* removeLayer: Removes the cartodb layer from the map.
-    Example: ```javascript map.removeLayer(cartodb_leaflet);```
-* hide: Hide the cartodb layer from the map.
-    Example: ```javascript map.removeLayer(cartodb_leaflet);```
-* show: Show again the cartodb layer in the map. Example: cartodb_leaflet.show();
-* setInteraction: Set the interaction of your layer to true or false. Example: cartodb_leaflet.setInteraction(false);
-* setOpacity: Change the opacity of the CartoDB layer. Example: cartodb_leaflet.setOpacity(0.3);
-* setQuery:
-* setStyle:
-* setInfowindow:
-* setLayerOrder: **Not available yet** Waiting for this ticket: https://github.com/CloudMade/Leaflet/issues/505
+- **removeLayer**: Removes the cartodb layer from the map.
+    Example: ```map.removeLayer(cartodb_leaflet);```
+- **hide**: Hide the cartodb layer from the map.
+    Example: ```cartodb_leaflet.hide();```
+- **show**: Show again the cartodb layer in the map.
+    Example: ```cartodb_leaflet.show();```
+- **setInteraction**: Set the interaction of your layer to true or false.
+    Example: ```cartodb_leaflet.setInteraction(false);```
+- **setOpacity**: Change the opacity of the CartoDB layer.
+    Example: ```cartodb_leaflet.setOpacity(0.3);```
+- **setQuery**: Change the query parameter for the layer
+    Example: ```cartodb_leaflet.setQuery("SELECT * FROM {{table_name}} WHERE cartodb_id > 10");```
+- **setStyle**: Change the style of the layer tiles
+    Example: ```cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");```
+- **setInfowindow**: Change the variables to show in the infowindow
+    Example: ```cartodb_leaflet.setInfowindow("SELECT cartodb_id,the_geom_webmercator FROM {{table_name}} WHERE cartodb_id={{feature}}");```
+- **setLayerOrder**: **Not available yet** Waiting for this ticket: https://github.com/CloudMade/Leaflet/issues/505
