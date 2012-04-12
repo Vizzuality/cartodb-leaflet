@@ -165,4 +165,4 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");```
 - **setInfowindow**: Change the variables to show in the infowindow
     Example: ```cartodb_leaflet.setInfowindow("SELECT cartodb_id,the_geom_webmercator FROM {{table_name}} WHERE cartodb_id={{feature}}");```
-- **setLayerOrder**: **Not available yet** Waiting for this ticket: https://github.com/CloudMade/Leaflet/issues/505
+- **setLayerOrder**: _Not available yet_ -> Waiting for this ticket: https://github.com/CloudMade/Leaflet/issues/505
