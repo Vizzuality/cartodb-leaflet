@@ -17,7 +17,7 @@ Html(*):
 
 ```html
 <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-  <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+<!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
 <script type="text/javascript" src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
 <script type="text/javascript" src="wax.leaf.min-6.0.0-beta2.js"></script>
 <script type="text/javascript" src="cartodb-leaflet.js"></script>
@@ -36,7 +36,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td><b>Parameter name</b></td>
 <td><b>Description</b></td>
 <td><b>Type</b></td>
-<td><b>Callback</b></td>
+<td><b>Callback variables</b></td>
 <td><b>Required</b></td>
 </tr>
 
@@ -93,7 +93,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>A callback when hovers in a feature</td>
 <td>Function</td>
 <td><b>feature:</b> The hovers feature id</td>
-<td>No (But only will work with `featureQuery specified`)</td>
+<td>No (But only will work with `featureQuery specified)</td>
 </tr>
 
 <tr>
@@ -101,7 +101,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>A callback when hovers out a feature</td>
 <td>Function</td>
 <td></td>
-<td>No (But only will work with `featureQuery specified`)</td>
+<td>No (But only will work with `featureQuery` specified)</td>
 </tr>
 
 <tr>
@@ -111,9 +111,9 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>
   <b>feature:</b> The hovers feature id<br/>
   <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
-  <b>data:</b> The CartoDB data of the clicked feature with the `featureQuery' sql.
+  <b>data:</b> The CartoDB data of the clicked feature with the `featureQuery` sql.
 </td>
-<td>No (But only will work with `featureQuery specified`)</td>
+<td>No (But only will work with `featureQuery` specified)</td>
 </tr>
 
 
