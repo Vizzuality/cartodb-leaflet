@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet for Leaflet
- * @version 0.41 [April 24, 2012]
+ * @version 0.42 [April 24, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -32,7 +32,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    query             -     If you want to apply any sql sentence to the table...
      *    opacity           -     If you want to change the opacity of the CartoDB layer
      *    tile_style        -     If you want to add other style to the layer
-     *    featureQuery      -     If you want to request data from the feature clicked
+     *    interactivity     -     Get data from the feature clicked ( without any request :) )
      *    featureMouseOver  -     Callback when user hovers a feature (return feature id)
      *    featureMouseClick -     Callback when user clicks a feature (return feature id, latlng and feature data)
      *    debug             -     Get error messages from the library
@@ -55,7 +55,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @params {map}
      */
     onAdd: function(map) {
-      if (!this.options.featureQuery) {
+      if (!this.options.interactivity) {
         this._addSimple();
       } else {
         this._addInteraction();
@@ -106,9 +106,11 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * Change the query when clicks in a feature
      * @params {Boolean | String} New sql for the request
      */
-    setFeatureQuery: function(value) {
+    setInteractivity: function(value) {
       // Set the new value to the layer options
-      this.options.featureQuery = value;
+      this.options.interactivity = value;
+      // Update tiles
+      this._update();
     },
 
 
@@ -140,20 +142,18 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     /**
-     * Change infowindow of the features
-     * @params {Boolean | String} New sql or activation for infowindow
+     * Hide the CartoDB layer
      */
-    hide: function(value) {
+    hide: function() {
       this.setOpacity(0);
       this.setInteraction(false);
     },
 
 
     /**
-     * Change infowindow of the features
-     * @params {Boolean | String} New sql or activation for infowindow
+     * Show the CartoDB layer
      */
-    show: function(value) {
+    show: function() {
       this.setOpacity(this.options.opacity);
       this.setInteraction(true);
     },
@@ -184,7 +184,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       this._remove();
 
       // Create the new updated one
-      if (!this.options.infowindow) {
+      if (!this.options.interactivity) {
         this._addSimple();
       } else {
         this._addInteraction();
@@ -308,7 +308,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     _bindWaxEvents: function(map,o) {
       switch (o.e.type) {
         case 'mousemove': if (this.options.featureMouseOver) {
-                            return this.options.featureMouseOver(o.data.cartodb_id);
+                            return this.options.featureMouseOver(o.data);
                           } else {
                             if (this.options.debug) throw('featureMouseOver function not defined');
                           }
@@ -317,37 +317,13 @@ if (typeof(L.CartoDBLayer) === "undefined") {
                             , latlng = map.layerPointToLatLng(container_point);
 
                           if (this.options.featureMouseClick) {
-                            this._requestFeatureData(o.data.cartodb_id,latlng);
+                            this.options.featureMouseClick(latlng,o.data);
                           } else {
                             if (this.options.debug) throw('featureMouseClick function not defined');
                           }
                           break;
         default:          break;
       }
-    },
-
-
-    /**
-     * Get back the feature data
-     * @param {String} Feature id of the element clicked
-     * @param {L.LatLng} Latitude and longitude leaflet object of the feature clicked
-     */
-    _requestFeatureData: function(feature,latlng) {
-      var self = this
-        , requestSQL = encodeURIComponent(this.options.featureQuery.replace('{{feature}}',feature).replace(/\{\{table_name\}\}/g,this.options.table_name));
-    
-      reqwest({
-        url:'http://'+ this.options.user_name +'.cartodb.com/api/v1/sql/?q='+requestSQL,
-        type: 'jsonp',
-        jsonpCallback: 'callback',
-        success: function(result) {
-          return self.options.featureMouseClick(feature, latlng, result.rows[0]);
-        },
-        error: function(e, msg) {
-          if (that.options.debug) throw('Error retrieving infowindow variables: ' + msg);
-          return self.options.featureMouseClick(feature, latlng, null);
-        }
-      });
     },
 
 
@@ -374,6 +350,13 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         tile_url = this._addUrlData(tile_url, style);
         grid_url = this._addUrlData(grid_url, style);
       }
+
+      // INTERACTIVITY?
+      if (this.options.interactivity) {
+        var interactivity = 'interactivity=' + encodeURIComponent(this.options.interactivity.replace(/ /g,''));
+        tile_url = this._addUrlData(tile_url, interactivity);
+        grid_url = this._addUrlData(grid_url, interactivity);
+      }
       
       // Build up the tileJSON
       return {
@@ -386,11 +369,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         grids_base: grid_url,
         opacity: this.options.opacity,
         formatter: function(options, data) {
-            return data.cartodb_id;
+          return data
         }
       };
     },
-
 
 
     /*

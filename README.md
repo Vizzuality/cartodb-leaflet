@@ -81,9 +81,9 @@ Using the library is really easy. It accepts the following parameters to manage 
 </tr>
 
 <tr>
-<td>featureQuery</td>
-<td>If you want to add interactivity to the layer, specifing a query for feature events.</td>
-<td>String</td>
+<td>interactivity</td>
+<td>If you want to add interactivity to the layer without making requests.</td>
+<td>String (columns separated by commas)</td>
 <td></td>
 <td>No</td>
 </tr>
@@ -92,8 +92,8 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>featureMouseOver</td>
 <td>A callback when hovers in a feature</td>
 <td>Function</td>
-<td><b>feature:</b> The hovers feature id</td>
-<td>No (But only will work with `featureQuery specified)</td>
+<td><b>data:</b> The feature data requested in `interactivity`</td>
+<td>No (But only will work with `interactivity` specified)</td>
 </tr>
 
 <tr>
@@ -101,7 +101,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>A callback when hovers out a feature</td>
 <td>Function</td>
 <td></td>
-<td>No (But only will work with `featureQuery` specified)</td>
+<td>No (But only will work with `interactivity` specified)</td>
 </tr>
 
 <tr>
@@ -109,13 +109,11 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>A callback when clicks in a feature</td>
 <td>Function</td>
 <td>
-  <b>feature:</b> The hovers feature id<br/>
   <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
-  <b>data:</b> The CartoDB data of the clicked feature with the `featureQuery` sql.
+  <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
 </td>
-<td>No (But only will work with `featureQuery` specified)</td>
+<td>No (But only will work with `interactivity` specified)</td>
 </tr>
-
 
 <tr>
 <td>tile_style</td>
@@ -146,9 +144,9 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 # Usage notes
 
-If you choose a CartoDB private table you'll need to [authenticate](http://developers.cartodb.com/api/authentication.html) beforehand. If you want to get a feature clicked data (via the `featureQuery` parameter), the columns must be in a query using `WHERE` clauses. Keep in mind the `cartodb_id` column is required.
+If you choose a CartoDB private table you'll need to [authenticate](http://developers.cartodb.com/api/authentication.html) beforehand. If you want to get a feature clicked || hover data (via the `interactivity` parameter), the columns must be in a string separated by commas.
 
-If you don't want to write the name of the table several times, you can use {{table_name}} in the `query`, `tile_style` and `featureQuery` parameters. {{feature}} is required in the `featureQuery` paramenter when you want to get specific information of it.
+If you don't want to write the name of the table several times, you can use {{table_name}} in the `query` or `tile_style` parameters.
 
 We strongly recommend the use of the files available in this repository. These are tested, and if you decide use updated ones, the library could not work.
 
@@ -176,7 +174,7 @@ var cartodb_leaflet = new L.CartoDBLayer({
   table_name: 'earthquakes',
   query: "SELECT * FROM {{table_name}}",
   tile_style: "#{{table_name}}{marker-fill:red}",
-  featureQuery: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
+  interactivity: "cartodb_id, magnitude",
   featureMouseClick: function(feature, latlng, data) {alert(feature)}
   auto_bound: true
 });
@@ -207,6 +205,6 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.setQuery("SELECT * FROM {{table_name}} WHERE cartodb_id > 10");```
 - **setStyle**: Change the style of the layer tiles
     Example: ```cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");```
-- **setFeatureQuery**: Change sql when request information of a clicked feature
-    Example: ```cartodb_leaflet.setFeatureQuery("SELECT cartodb_id,the_geom_webmercator FROM {{table_name}} WHERE cartodb_id={{feature}}");```
+- **setInteractivity**: Change the columns you want to get data (it needs to reload the tiles)
+    Example: ```cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");```
 - **setLayerOrder**: _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505
