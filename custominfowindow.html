@@ -13,11 +13,12 @@
   <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
   <script type="text/javascript" src="wax.leaf.min-6.0.0-beta2.js"></script>
   <script type="text/javascript" src="cartodb-leaflet.js"></script>
+  <script type="text/javascript" src="cartodb-infowindow.js"></script>
 
   <script type="text/javascript">
 
-	  function initialize() {
-			var map = new L.Map('map_canvas').setView(new L.LatLng(20,0), 3);
+    function initialize() {
+      var map = new L.Map('map_canvas').setView(new L.LatLng(20,0), 3);
 
       var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
       cloudmadeAttrib = 'Map data &copy; 2012 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
@@ -26,31 +27,31 @@
 
 
       // Create leaflet standard popup
-      var popup = new L.Popup();
+      var popup = new L.CartoDBPopup();
 
 
       // First cartodb layer, countries
-	    var cartodb_leaflet1 = new L.CartoDBLayer({
-	      map: map,
-	      user_name:'examples',
-	      table_name: 'country_colors',
-	      query: "SELECT * FROM {{table_name}}",
-	      auto_bound: false,
-	      debug: true
-	    });
+      var cartodb_leaflet1 = new L.CartoDBLayer({
+        map: map,
+        user_name:'examples',
+        table_name: 'country_colors',
+        query: "SELECT * FROM {{table_name}}",
+        auto_bound: false,
+        debug: true
+      });
       // Adding layer to map
       map.addLayer(cartodb_leaflet1);
 
 
       // Second cartodb layer, earthquakes
-	    var cartodb_leaflet2 = new L.CartoDBLayer({
-	      map: map,
-	      user_name:"examples",
-	      table_name: 'earthquakes',
-	      query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
-	      tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
+      var cartodb_leaflet2 = new L.CartoDBLayer({
+        map: map,
+        user_name:"examples",
+        table_name: 'earthquakes',
+        query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
+        tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
         opacity: 0.8,
-	      featureQuery: "SELECT cartodb_id,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
+        featureQuery: "SELECT cartodb_id,magnitude FROM {{table_name}} WHERE cartodb_id={{feature}}",
         featureMouseOver: function(feature) {
           document.body.style.cursor = "pointer";
         },
@@ -59,12 +60,7 @@
         },
         featureMouseClick: function(feature, latlng, data) {
           // Set popup content
-          var html = '';
-          for(var column in data) {
-            html += '<label>' + column + '</label>';
-            html += '<p>' + data[column] + '</p>';
-          }
-          popup.setContent(html);
+          popup.setContent(data);
 
           // Set latlng
           popup.setLatLng(latlng);
@@ -72,12 +68,12 @@
           // Show it!
           map.openPopup(popup);
         },
-	      auto_bound: true,
-	      debug: false
-	    });
+        auto_bound: true,
+        debug: false
+      });
       // Adding layer to map
       map.addLayer(cartodb_leaflet2);
-	  }
+    }
   </script>
 </head>
 <body onload="initialize()">
