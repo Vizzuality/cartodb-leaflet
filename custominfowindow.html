@@ -52,7 +52,7 @@
         tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
         opacity: 0.8,
         interactivity: "cartodb_id, magnitude",
-        featureMouseOver: function(feature) {
+        featureMouseOver: function(data) {
           document.body.style.cursor = "pointer";
         },
         featureMouseOut: function() {
