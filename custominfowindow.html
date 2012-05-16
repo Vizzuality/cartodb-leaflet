@@ -3,17 +3,16 @@
 <head>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-  <title>Using CartoDB with Leaflet</title>
+  <title>Using CartoDB with Leaflet and custom infowindow</title>
   <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+  <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map_canvas {height:100%;}</style>
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
   <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
-
-
-  <link  href="cartodb.css" rel="stylesheet" type="text/css">
+  <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
   <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-  <script type="text/javascript" src="wax.leaf.min-6.0.0-beta2.js"></script>
-  <script type="text/javascript" src="cartodb-leaflet.js"></script>
-  <script type="text/javascript" src="cartodb-infowindow.js"></script>
+  <script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"></script>
+  <script type="text/javascript" src="dist/cartodb-leaflet.js"></script>
+  <script type="text/javascript" src="dist/cartodb-infowindow.js"></script>
 
   <script type="text/javascript">
 
