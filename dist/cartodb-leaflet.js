@@ -361,7 +361,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       
       // Build up the tileJSON
       return {
-        blankImage: 'img/blank_tile.png', 
+        blankImage: '../img/blank_tile.png', 
         tilejson: '1.0.0',
         scheme: 'xyz',
         tiles: [tile_url],
