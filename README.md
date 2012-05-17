@@ -144,10 +144,8 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 # Usage notes
 
-If you choose a CartoDB private table you'll need to [authenticate](http://developers.cartodb.com/api/authentication.html) beforehand. If you want to get a feature clicked || hover data (via the `interactivity` parameter), the columns must be in a string separated by commas.
-
+If you want to get a feature clicked || hover data (via the `interactivity` parameter), the columns must be in a string separated by commas.
 If you don't want to write the name of the table several times, you can use {{table_name}} in the `query` or `tile_style` parameters.
-
 We strongly recommend the use of the files available in this repository. These are tested, and if you decide use updated ones, the library could not work.
 
 # Example
@@ -157,7 +155,7 @@ Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/custompopup
 First of all create your map:
 
 ```javascript
-var map = new L.Map('map_canvas');
+var map = new L.Map('map');
 var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 	cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
 	cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
@@ -168,7 +166,6 @@ Then create the CartoDB layer:
 
 ```javascript
 var cartodb_leaflet = new L.CartoDBLayer({
-  map_canvas: 'map_canvas',
   map: map,
   user_name:'example',
   table_name: 'earthquakes',

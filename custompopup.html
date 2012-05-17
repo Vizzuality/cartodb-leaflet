@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
   <title>Using CartoDB with Leaflet and custom infowindow</title>
   <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
-  <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map_canvas {height:100%;}</style>
+  <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map {height:100%;}</style>
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
   <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
   <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
@@ -17,7 +17,7 @@
   <script type="text/javascript">
 
     function initialize() {
-      var map = new L.Map('map_canvas').setView(new L.LatLng(20,0), 3);
+      var map = new L.Map('map').setView(new L.LatLng(20,0), 3);
 
       var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
       cloudmadeAttrib = 'Map data &copy; 2012 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
@@ -76,6 +76,6 @@
   </script>
 </head>
 <body onload="initialize()">
-  <div id="map_canvas"></div>
+  <div id="map"></div>
 </body>
 </html>
