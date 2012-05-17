@@ -161,7 +161,7 @@ First of all add the necessary script and css files:
 <script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"></script>
 <script type="text/javascript" src="dist/cartodb-leaflet.js"></script>
 <script type="text/javascript" src="dist/cartodb-popup.js"></script>
-``
+```
 
 First of all create your map:
 
