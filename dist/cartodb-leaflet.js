@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet for Leaflet
- * @version 0.42 [April 24, 2012]
+ * @version 0.42 [May 18, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
