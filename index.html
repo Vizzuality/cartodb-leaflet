@@ -17,7 +17,7 @@
     </script>
     <noscript><meta http-equiv="refresh" content="0;url=/no_javascript.html"></noscript>
   </head>
-  <body class="developers examples">
+  <body class="developers examples" onload="initialize()">
     <div class="background blue grid fixed">
       <header>
         <h1 class="left">
@@ -51,7 +51,7 @@
           <script type="text/javascript" src="dist/cartodb-leaflet.js"></script>
 
           <script type="text/javascript">
-            $(function() {
+            function initialize() {
               var map = new L.Map('map').setView(new L.LatLng(20,0), 3);
 
               var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
@@ -112,7 +112,7 @@
               });
               // Adding layer to map
               map.addLayer(cartodb_leaflet2);
-            });
+            }
           </script>
           <div id="map"></div>
           <span class="separator"></span>
@@ -133,7 +133,7 @@
 &#60;script type="text/javascript" src="dist/cartodb-leaflet.js"&#62;&#60;/script&#62;
 
 &#60;script type="text/javascript"&#62;
-  $(function() {
+  function initialize() {
     var map = new L.Map('map').setView(new L.LatLng(20,0), 3);
 
     var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
@@ -194,7 +194,7 @@
     });
     // Adding layer to map
     map.addLayer(cartodb_leaflet2);
-  });
+  }
 &#60;/script&#62;
             </pre>
           </div>
