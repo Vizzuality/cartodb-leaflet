@@ -138,7 +138,6 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td></td>
 <td>No</td>
 </tr>
-
 </table>
 
 
@@ -152,6 +151,18 @@ We strongly recommend the use of the files available in this repository. These a
 
 Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/custompopup.html)!
 
+First of all add the necessary script and css files:
+
+```html
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+<!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+<link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
+<script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+<script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"></script>
+<script type="text/javascript" src="dist/cartodb-leaflet.js"></script>
+<script type="text/javascript" src="dist/cartodb-popup.js"></script>
+``
+
 First of all create your map:
 
 ```javascript
@@ -162,7 +173,7 @@ var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D7597
 map.addLayer(cloudmade);
 ```
   
-Then create the CartoDB layer:
+When the document is loaded, start creating the map:
 
 ```javascript
 var cartodb_leaflet = new L.CartoDBLayer({
