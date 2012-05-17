@@ -163,7 +163,7 @@ First of all add the necessary script and css files:
 <script type="text/javascript" src="dist/cartodb-popup.js"></script>
 ```
 
-First of all create your map:
+When the document is loaded, start creating the map:
 
 ```javascript
 var map = new L.Map('map');
