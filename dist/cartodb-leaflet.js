@@ -133,9 +133,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     setInteraction: function(bool) {
       if (this.interaction) {
         if (bool) {
-          this.interaction.on('on');
+          var self = this;
+          this.interaction.on('on', function(o) {self._bindWaxEvents(self.options.map,o)});
         } else {
-          this.interaction.off('off');
+          this.interaction.off('on');
         }
       }
     },
