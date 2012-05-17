@@ -204,7 +204,7 @@
             <ul class="vt related">  
               <li><a href="http://developers.cartodb.com/documentation/cartodb-apis.html#maps_api">CartoDB Maps API</a></li>
               <li><a href="http://vizzuality.github.com/cartodb-gmapsv3">CartoDB Google Maps library</a></li>
-              <li><a href="#custom-infowindow">CartoDB Leaflet library with custom infowindow</a></li>
+              <li><a href="#custom-popup">CartoDB Leaflet library with custom popup</a></li>
             </ul>
           </div>
         </div>
@@ -400,10 +400,10 @@ var cartodb_leaflet = new L.CartoDBLayer({
             </li>
           </ul>
 
-          <h5 class="margin30" id="custom-infowindow">Custom infowindow</h5>
-          <p class="margin15 light">If you want to use the cartodb custom infowindow, you need to add the script in the html:</p>
+          <h5 class="margin30" id="custom-popup">Custom popup</h5>
+          <p class="margin15 light">If you want to use the cartodb custom popup, you need to add the script in the html:</p>
           <pre class="margin10" data-language="javascript">
-&#60;script type="text/javascript" src="cartodb-infowindow.js"&#62;&#60;/script&#62;
+&#60;script type="text/javascript" src="cartodb-popup.js"&#62;&#60;/script&#62;
           </pre>
 
           <p class="light margin15">Create the CartoDB popup:</p>
@@ -427,7 +427,7 @@ featureMouseClick: function(latlng, data) {
 ...
           </pre>
 
-          <p class="light margin15">You can see an example using it <a href="custominfowindow.html">here</a>.</p>
+          <p class="light margin15">You can see an example using it <a href="custompopup.html">here</a>.</p>
         </div>
       </section>
   

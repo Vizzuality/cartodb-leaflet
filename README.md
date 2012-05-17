@@ -152,7 +152,7 @@ We strongly recommend the use of the files available in this repository. These a
 
 # Example
 
-Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/)!
+Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/custompopup.html)!
 
 First of all create your map:
 
