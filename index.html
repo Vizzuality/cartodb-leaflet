@@ -38,8 +38,6 @@
       <section class="shadow top">
         <div class="content">
           <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.42</em></hgroup>
-          <p class="light margin10">Use your CartoDB tables with a Leaflet map.</p>
-          <p class="light margin10">The code is available on <a href="https://github.com/vizzuality/cartodb-leaflet" target="_blank">Github</a>. If you have any question there is a complete <a href="#documentation">documentation</a> or you can ask in the <a target="_blank" href="https://groups.google.com/forum/#!forum/cartodb">CartoDB Google group</a>.</p>
         </div>
         <div class="content no_padding border code">
 
@@ -123,80 +121,10 @@
       <section class="shadow leftwards bottom nav">
         <div class="content overflow">
           <div class="left">
-            <h3 class="big">Source code</h3>
-            <pre class="margin25" data-language="javascript">
-&#60;link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" /&#62;
-&#60;!--[if lt IE 9]&#62; &#60;link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /&#62; &#60;![endif]--&#62;
-&#60;link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css"&#62;
-&#60;script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"&#62;&#60;/script&#62;
-&#60;script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"&#62;&#60;/script&#62;
-&#60;script type="text/javascript" src="dist/cartodb-leaflet-min.js"&#62;&#60;/script&#62;
-
-&#60;script type="text/javascript"&#62;
-  function initialize() {
-    var map = new L.Map('map').setView(new L.LatLng(20,0), 3);
-
-    var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-    cloudmadeAttrib = 'Map data &copy; 2012 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
-    cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
-    map.addLayer(cloudmade,true);
-
-
-    // Create leaflet standard popup
-    var popup = new L.Popup();
-
-
-    // First cartodb layer, countries
-    var cartodb_leaflet1 = new L.CartoDBLayer({
-      map: map,
-      user_name:'examples',
-      table_name: 'country_colors',
-      query: "SELECT * FROM {{table_name}}",
-      auto_bound: false,
-      debug: true
-    });
-    // Adding layer to map
-    map.addLayer(cartodb_leaflet1);
-
-
-    // Second cartodb layer, earthquakes
-    cartodb_leaflet2 = new L.CartoDBLayer({
-      map: map,
-      user_name:"examples",
-      table_name: 'earthquakes',
-      query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
-      tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
-      opacity: 0.8,
-      interactivity: "cartodb_id, magnitude",
-      featureMouseOver: function(data) {
-        document.body.style.cursor = "pointer";
-      },
-      featureMouseOut: function() {
-        document.body.style.cursor = "default";
-      },
-      featureMouseClick: function(latlng, data) {
-        // Set popup content
-        var html = '';
-        for(var column in data) {
-          html += '<label>' + column + '</label>';
-          html += '<p>' + data[column] + '</p>';
-        }
-        popup.setContent(html);
-
-        // Set latlng
-        popup.setLatLng(latlng);
-
-        // Show it!
-        map.openPopup(popup);
-      },
-      auto_bound: true,
-      debug: false
-    });
-    // Adding layer to map
-    map.addLayer(cartodb_leaflet2);
-  }
-&#60;/script&#62;
-            </pre>
+            <h3 class="big">Overview</h3>
+            <p class="light margin15">Use your CartoDB tables with a Leaflet map.</p>
+            <p class="light margin15"><a href="http://leaflet.cloudmade.com/" target="_blank">Leaflet</a> is a modern, lightweight open-source JavaScript library for mobile-friendly interactive maps. It is developed by <a href="http://cloudmade.com/" target="_blank">CloudMade</a>. It still has all the features most developers ever need for online maps, while providing a fast, pleasant user experience.</p>
+            <p class="light margin15">The code is available on <a href="https://github.com/vizzuality/cartodb-leaflet" target="_blank">Github</a>. If you have any question there is a complete <a href="#documentation">documentation</a> or you can ask in the <a target="_blank" href="https://groups.google.com/forum/#!forum/cartodb">CartoDB mailing list</a>.</p>
           </div>
           <div class="right">
             <a class="button blue download" href="https://github.com/Vizzuality/cartodb-leaflet/zipball/gh-pages">Download this library</a>
@@ -204,7 +132,7 @@
             <ul class="vt related">  
               <li><a href="http://developers.cartodb.com/documentation/cartodb-apis.html#maps_api">CartoDB Maps API</a></li>
               <li><a href="http://vizzuality.github.com/cartodb-gmapsv3">CartoDB Google Maps library</a></li>
-              <li><a href="#custom-popup">CartoDB Leaflet library with custom popup</a></li>
+              <li><a href="#custom-popup">CartoDB Leaflet w/ custom popup</a></li>
             </ul>
           </div>
         </div>
@@ -320,7 +248,7 @@
 
           <p class="margin15 light">First of all add the necessary script and css files:</p>
 
-          <pre class="margin10" data-language="javascript">
+          <pre class="margin10" data-language="html">
 &#60;link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" /&#62;
 &#60;!--[if lt IE 9]&#62; &#60;link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /&#62; &#60;![endif]--&#62;
 &#60;link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css"&#62;
@@ -401,7 +329,7 @@ var cartodb_leaflet = new L.CartoDBLayer({
 
           <h5 class="margin30" id="custom-popup">Custom popup</h5>
           <p class="margin15 light">If you want to use the cartodb custom popup, you need to add the script in the html:</p>
-          <pre class="margin10" data-language="javascript">
+          <pre class="margin10" data-language="html">
 &#60;script type="text/javascript" src="dist/cartodb-popup-min.js"&#62;&#60;/script&#62;
           </pre>
 
