@@ -213,6 +213,8 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.setQuery("SELECT * FROM {{table_name}} WHERE cartodb_id > 10");```
 - **setStyle**: Change the style of the layer tiles
     Example: ```cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");```
+- **isVisible**: Get the visibility of the layer
+    Example: ```cartodb_leaflet.isVisible();```
 - **setInteractivity**: Change the columns you want to get data (it needs to reload the tiles)
     Example: ```cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");```
 - **setLayerOrder**: _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505

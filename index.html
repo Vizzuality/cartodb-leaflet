@@ -37,7 +37,7 @@
     <div class="background floating">
       <section class="shadow top">
         <div class="content">
-          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.42</em></hgroup>
+          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.43</em></hgroup>
         </div>
         <div class="content no_padding border code">
 
@@ -317,6 +317,10 @@ var cartodb_leaflet = new L.CartoDBLayer({
             <li class="margin15" style="display:block">
               <p class="light"><b>setStyle</b>: Change the style of the layer tiles.</p>
               <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");</pre>
+            </li>
+            <li class="margin15" style="display:block">
+              <p class="light"><b>isVisible</b>: Get the visibility of the layer.</p>
+              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.isVisible();</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setInteractivity</b>: Change the columns you want to get data (it needs to reload the tiles).</p>

@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.42 [May 18, 2012]
+ * @version 0.43 [May 18, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -20,7 +20,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       query:          "SELECT * FROM {{table_name}}",
       opacity:        0.99,
       auto_bound:     false,
-      debug:          false
+      debug:          false,
+      visible:        true
     },
 
     /**
@@ -144,11 +145,21 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     /**
+     * Active or desactive interaction
+     * @params {Boolean} Choose if wants interaction or not
+     */
+    isVisible: function() {
+      return this.options.visible
+    },
+
+
+    /**
      * Hide the CartoDB layer
      */
     hide: function() {
       this.setOpacity(0);
       this.setInteraction(false);
+      this.options.visible = false;
     },
 
 
@@ -158,6 +169,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     show: function() {
       this.setOpacity(this.options.opacity);
       this.setInteraction(true);
+      this.options.visible = true;
     },
 
 
