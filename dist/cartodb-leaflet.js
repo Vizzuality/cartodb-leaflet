@@ -1,5 +1,5 @@
 /**
- * @name cartodb-leaflet for Leaflet
+ * @name cartodb-leaflet
  * @version 0.42 [May 18, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
@@ -38,6 +38,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    debug             -     Get error messages from the library
      *    auto_bound        -     Let cartodb auto-bound-zoom in the map (opcional - default = false)
      */
+
     initialize: function (options) {
       // Set options
       L.Util.setOptions(this, options);

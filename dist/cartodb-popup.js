@@ -1,7 +1,14 @@
 
-////////////////////////
-// CartoDB Infowindow //
-////////////////////////
+/**
+ * @name cartodb-popup
+ * @version 1.0 [May 18, 2012]
+ * @author: jmedina@vizzuality.com
+ * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
+ *               Licensed under <a
+ *               href="http://opensource.org/licenses/mit-license.php">MIT</a>
+ *               license.<br/> This library lets you to use a new Popup with Leaflet.
+ *                 
+ */
 
 
 L.CartoDBPopup = L.Class.extend({
@@ -18,12 +25,21 @@ L.CartoDBPopup = L.Class.extend({
     className: ''
   },
 
+  /**
+   * Initialize the CartoDB Popup
+   * @params {options} Object with popup options
+   * @params {source} Object with source
+   */
   initialize: function (options, source) {
     L.Util.setOptions(this, options);
 
     this._source = source;
   },
 
+  /**
+   * When map adds the popup
+   * @params {map} Leaflet map
+   */
   onAdd: function (map) {
     this._map = map;
 
@@ -45,6 +61,10 @@ L.CartoDBPopup = L.Class.extend({
     this._container.style.opacity = '1';
   },
 
+  /**
+   * When map removes the popup
+   * @params {options} Object with popup options
+   */
   onRemove: function (map) {
     map._panes.popupPane.removeChild(this._container);
 
@@ -58,18 +78,29 @@ L.CartoDBPopup = L.Class.extend({
     this._map = null;
   },
 
+  /**
+   * Set the correct position for the popup
+   * @params {latlng} A new Leaflet LatLng object
+   */
   setLatLng: function (latlng) {
     this._latlng = latlng;
     this._update();
     return this;
   },
 
+  /**
+   * Adds new content to the popup
+   * @params {content} It should be a string or an object
+   */
   setContent: function (content) {
     this._content = content;
     this._update();
     return this;
   },
 
+  /**
+   * Close the popup (private)
+   */
   _close: function () {
     var map = this._map;
 
@@ -92,7 +123,9 @@ L.CartoDBPopup = L.Class.extend({
     }
   },
  
-
+  /**
+   * Create the default content for the popup (private)
+   */
   _initLayout: function () {
     var prefix = 'cartodb-popup',
       container = this._container = L.DomUtil.create('div', prefix + ' ' + this.options.className),
@@ -118,6 +151,9 @@ L.CartoDBPopup = L.Class.extend({
   },
 
 
+  /**
+   * Update the popup (position, content, place,...)
+   */
   _update: function () {
     if (!this._map) { return; }
 
@@ -138,6 +174,9 @@ L.CartoDBPopup = L.Class.extend({
     this._adjustPan();
   },
 
+  /**
+   * Update the content (private)
+   */
   _updateContent: function () {
     if (!this._content) { return; }
 
@@ -159,6 +198,9 @@ L.CartoDBPopup = L.Class.extend({
     this.fire('contentupdate');
   },
 
+  /**
+   * Update the layout (private)
+   */
   _updateLayout: function () {
     var container = this._contentNode;
 
@@ -188,6 +230,9 @@ L.CartoDBPopup = L.Class.extend({
     this._containerWidth = this._container.offsetWidth;
   },
 
+  /**
+   * Update the position (private)
+   */
   _updatePosition: function () {
     var pos = this._map.latLngToLayerPoint(this._latlng);
 
@@ -198,6 +243,9 @@ L.CartoDBPopup = L.Class.extend({
     this._container.style.left = this._containerLeft + 'px';
   },
 
+  /**
+   * Adjust the pan of the map when opens the popup (private)
+   */
   _adjustPan: function () {
     if (!this.options.autoPan) { return; }
 
@@ -232,6 +280,9 @@ L.CartoDBPopup = L.Class.extend({
     }
   },
 
+  /**
+   * Handler when popup is clicked for closing it (private)
+   */
   _onCloseButtonClick: function (e) {
     this._close();
     L.DomEvent.stop(e);
