@@ -51,13 +51,13 @@
         tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
         opacity: 0.8,
         interactivity: "cartodb_id, magnitude",
-        featureMouseOver: function(data) {
+        featureMouseOver: function(ev,latlng,data) {
           document.body.style.cursor = "pointer";
         },
         featureMouseOut: function() {
           document.body.style.cursor = "default";
         },
-        featureMouseClick: function(latlng, data) {
+        featureMouseClick: function(ev,latlng,data) {
           // Set popup content
           popup.setContent(data);
 

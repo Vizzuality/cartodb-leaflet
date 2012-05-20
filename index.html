@@ -37,7 +37,7 @@
     <div class="background floating">
       <section class="shadow top">
         <div class="content">
-          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.43</em></hgroup>
+          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.44</em></hgroup>
         </div>
         <div class="content no_padding border code">
 
@@ -84,13 +84,13 @@
                 tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
                 opacity: 0.8,
                 interactivity: "cartodb_id, magnitude",
-                featureMouseOver: function(data) {
+                featureMouseOver: function(ev,latlng,data) {
                   document.body.style.cursor = "pointer";
                 },
                 featureMouseOut: function() {
                   document.body.style.cursor = "default";
                 },
-                featureMouseClick: function(latlng, data) {
+                featureMouseClick: function(ev,latlng,data) {
                   // Set popup content
                   var html = '';
                   for(var column in data) {
@@ -197,7 +197,11 @@
               <td><i>featureMouseOver</i></td>
               <td>A callback when hovers in a feature</td>
               <td>Function</td>
-              <td><b>data:</b> The feature data requested in <i>interactivity</i></td>
+              <td>
+                <b>event:</b> Mouse event object<br/>
+                <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
+                <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
+              </td>
               <td>No (But only will work with <i>interactivity</i> specified)</td>
             </tr>
             <tr>
@@ -212,8 +216,9 @@
               <td>A callback when clicks in a feature</td>
               <td>Function</td>
               <td>
+                <b>event:</b> Mouse event object<br/>
                 <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
-                <b>data:</b> The CartoDB data of the clicked feature with the <i>interactivity</i> param.
+                <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
               </td>
               <td>No (But only will work with <i>interactivity</i> specified)</td>
             </tr>
@@ -278,7 +283,7 @@ var cartodb_leaflet = new L.CartoDBLayer({
   query: "SELECT * FROM {{table_name}}",
   tile_style: "#{{table_name}}{marker-fill:red}",
   interactivity: "cartodb_id, magnitude",
-  featureMouseClick: function(feature, latlng, data) {alert(feature)}
+  featureMouseClick: function(ev, latlng, data) {alert(data)}
   auto_bound: true
 });
           </pre>

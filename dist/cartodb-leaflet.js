@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.43 [May 18, 2012]
+ * @version 0.44 [May 20, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -304,7 +304,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         .map(this.options.map)
         .tilejson(this.tilejson)
         .on('on',function(o) {self._bindWaxEvents(self.options.map,o)})
-        .on('off', function(o){
+        .on('off', function(){
           if (self.options.featureMouseOut) {
             return self.options.featureMouseOut && self.options.featureMouseOut();
           } else {
@@ -320,18 +320,18 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @param {Event} Wax event
      */
     _bindWaxEvents: function(map,o) {
+      var container_point = map.mouseEventToLayerPoint(o.e)
+        , latlng = map.layerPointToLatLng(container_point);
+
       switch (o.e.type) {
         case 'mousemove': if (this.options.featureMouseOver) {
-                            return this.options.featureMouseOver(o.data);
+                            return this.options.featureMouseOver(o.e,latlng,o.data);
                           } else {
                             if (this.options.debug) throw('featureMouseOver function not defined');
                           }
                           break;
-        case 'mouseup':   var container_point = map.mouseEventToLayerPoint(o.e)
-                            , latlng = map.layerPointToLatLng(container_point);
-
-                          if (this.options.featureMouseClick) {
-                            this.options.featureMouseClick(latlng,o.data);
+        case 'mouseup':   if (this.options.featureMouseClick) {
+                            this.options.featureMouseClick(o.e,latlng,o.data);
                           } else {
                             if (this.options.debug) throw('featureMouseClick function not defined');
                           }

@@ -92,7 +92,11 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>featureMouseOver</td>
 <td>A callback when hovers in a feature</td>
 <td>Function</td>
-<td><b>data:</b> The feature data requested in `interactivity`</td>
+<td>
+  <b>event:</b> Mouse event object<br/>
+  <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
+  <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
+</td>
 <td>No (But only will work with `interactivity` specified)</td>
 </tr>
 
@@ -109,6 +113,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td>A callback when clicks in a feature</td>
 <td>Function</td>
 <td>
+  <b>event:</b> Mouse event object<br/>
   <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
   <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
 </td>
@@ -183,7 +188,7 @@ var cartodb_leaflet = new L.CartoDBLayer({
   query: "SELECT * FROM {{table_name}}",
   tile_style: "#{{table_name}}{marker-fill:red}",
   interactivity: "cartodb_id, magnitude",
-  featureMouseClick: function(feature, latlng, data) {alert(feature)}
+  featureMouseClick: function(ev, latlng, data) {alert(data)}
   auto_bound: true
 });
 ```
