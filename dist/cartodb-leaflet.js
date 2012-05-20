@@ -34,8 +34,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    opacity           -     If you want to change the opacity of the CartoDB layer
      *    tile_style        -     If you want to add other style to the layer
      *    interactivity     -     Get data from the feature clicked ( without any request :) )
-     *    featureMouseOver  -     Callback when user hovers a feature (return feature id)
-     *    featureMouseClick -     Callback when user clicks a feature (return feature id, latlng and feature data)
+     *    featureMouseOver  -     Callback when user hovers a feature (return mouse event, latlng and feature data)
+     *    featureMouseOut   -     Callback when user hovers out a feature
+     *    featureMouseClick -     Callback when user clicks a feature (return mouse event, latlng and feature data)
      *    debug             -     Get error messages from the library
      *    auto_bound        -     Let cartodb auto-bound-zoom in the map (opcional - default = false)
      */
