@@ -350,7 +350,7 @@ var popup = new L.CartoDBPopup();
           <p class="light margin15">And then use as you want:</p>
           <pre data-language="javascript">
 ...
-featureMouseClick: function(latlng, data) {
+featureMouseClick: function(ev,latlng,data) {
   // Set popup content
   popup.setContent(data);
 
