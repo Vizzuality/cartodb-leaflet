@@ -4,7 +4,7 @@ table tr {border-top: 1px solid #CCC; background-color:white; margin: 0; padding
 table tr td {border: 1px solid #CCC; text-align: left; margin: 0; padding: 6px 13px;}
 table td b {color:#333333;}
 span.string p {display:inline-block; width:auto!important; font-size:13px;}
-div.right {min-height:100px!important;}
+section.nav div.right {min-height:100px!important;}
 
 /* Fonts for Firefox */
 header nav a {font:bold 12px "Segoe UI Bold", "Helvetica Neue", "Helvetica", Arial;}
