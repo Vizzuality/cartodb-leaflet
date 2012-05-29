@@ -37,11 +37,19 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    featureMouseOver  -     Callback when user hovers a feature (return mouse event, latlng and feature data)
      *    featureMouseOut   -     Callback when user hovers out a feature
      *    featureMouseClick -     Callback when user clicks a feature (return mouse event, latlng and feature data)
+     *    tiler_protocol    -     Tiler protocol (opcional - default = 'http')
+     *    tiler_domain      -     Tiler domain (opcional - default = 'cartodb.com')
+     *    tiler_port        -     Tiler port as a string (opcional - default = '80')
      *    debug             -     Get error messages from the library
      *    auto_bound        -     Let cartodb auto-bound-zoom in the map (opcional - default = false)
      */
 
     initialize: function (options) {
+        
+      this.options.tiler_protocol = options.tiler_protocol || 'http';
+      this.options.tiler_domain = options.tiler_domain || 'cartodb.com';
+      this.options.tiler_port = options.tiler_port || '80';
+  
       // Set options
       L.Util.setOptions(this, options);
       
@@ -213,7 +221,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     _setBounds: function() {
       var self = this;
       reqwest({
-        url:'http://'+this.options.user_name+'.cartodb.com/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ this.options.table_name),
+        url: this.generateUrl() + '/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ this.options.table_name),
         type: 'jsonp',
         jsonpCallback: 'callback',
         success: function(result) {
@@ -281,7 +289,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         , query = encodeURIComponent(this.options.query.replace(/\{\{table_name\}\}/g,this.options.table_name));
 
       // Add the cartodb tiles
-      var cartodb_url = 'http://' + this.options.user_name + '.cartodb.com/tiles/' + this.options.table_name + '/{z}/{x}/{y}.png?sql=' + query +'&style=' + tile_style;
+      var cartodb_url = this.generateUrl() + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}.png?sql=' + query +'&style=' + tile_style;
       this.layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB', opacity: this.options.opacity});
 
       this.options.map.addLayer(this.layer,false);
@@ -347,7 +355,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @return {Object} Options for L.TileLayer
      */
     _generateTileJson: function () {
-      var core_url = 'http://' + this.options.user_name + '.cartodb.com';  
+      var core_url = this.generateUrl();  
       var base_url = core_url + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}';
       var tile_url = base_url + '.png';
       var grid_url = base_url + '.grid.json';
@@ -435,7 +443,16 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     _addUrlData: function (url, data) {
         url += (this._parseUri(url).query) ? '&' : '?';
         return url += data;
+    },
+    
+    /**
+     * Generate a URL for the tiler
+     * @params {String} Options including tiler_protocol, user_name, tiler_domain and tiler_port
+     */    
+    generateUrl: function( options ){
+        return options.tiler_protocol + '://' + options.user_name + '.' + options.tiler_domain + ':' + options.tiler_port;
     }
+    
   });
 }
 
