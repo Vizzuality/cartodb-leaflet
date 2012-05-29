@@ -143,6 +143,30 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td></td>
 <td>No</td>
 </tr>
+
+<tr>
+<td>tiler_protocol</td>
+<td>Tiler protocol (opcional - default = 'http').</td>
+<td>No</td>
+<td></td>
+</tr>
+
+<tr>
+<td>tiler_domain</td>
+<td>Tiler domain (opcional - default = 'cartodb.com').</td>
+<td></td>
+<td>No</td>
+<td></td>
+</tr>
+
+<tr>
+<td>tiler_port</td>
+<td>Tiler port as a string (opcional - default = '80').</td>
+<td></td>
+<td>No</td>
+<td></td>
+</tr>
+
 </table>
 
 
