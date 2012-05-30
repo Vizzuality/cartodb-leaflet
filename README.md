@@ -167,6 +167,30 @@ Using the library is really easy. It accepts the following parameters to manage 
 <td></td>
 </tr>
 
+<tr>
+<td>sql_protocol</td>
+<td>SQL API protocol (opcional - default = 'http').</td>
+<td>String</td>
+<td></td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>sql_domain</td>
+<td>SQL API domain (opcional - default = 'cartodb.com').</td>
+<td>String</td>
+<td></td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>sql_port</td>
+<td>SQL API port as a string (opcional - default = '80').</td>
+<td>String</td>
+<td></td>
+<td>No</td>
+</tr>
+
 </table>
 
 

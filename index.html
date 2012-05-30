@@ -36,7 +36,7 @@
     <div class="background floating">
       <section class="shadow top">
         <div class="content">
-          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.44</em></hgroup>
+          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.45</em></hgroup>
         </div>
         <div class="content no_padding border code">
 
@@ -173,14 +173,14 @@
             </tr>
             <tr>
               <td><i>query</i></td>
-              <td>A SQL query.</td>
+              <td>A SQL query. Default: <b>"SELECT * FROM {{table_name}}"</b></td>
               <td>String</td>
               <td></td>
               <td>Yes</td>
             </tr>
             <tr>
               <td><i>opacity</i></td>
-              <td>If you want to change the opacity of the CartoDB layer.</td>
+              <td>If you want to change the opacity of the CartoDB layer. Default: <b>1</b></td>
               <td>Number</td>
               <td></td>
               <td>No</td>
@@ -242,23 +242,47 @@
               <td></td>
               <td>No</td>
             </tr>
+            <tr class="separator"><td></td><td></td><td></td><td></td><td></td></tr>
             <tr>
               <td><i>tiler_protocol</i></td>
-              <td>Protocol for the tiler URL. Default: <b>http</b></td>
+              <td>Protocol for the tiler URL. Default: <b>"http"</b></td>
               <td>String</td>
               <td></td>
               <td>No</td>
             </tr>
             <tr>
               <td><i>tiler_domain</i></td>
-              <td>Base domain of the tiler URL. Default: <b>cartodb.com</b> </td>
+              <td>Base domain of the tiler URL. Default: <b>"cartodb.com"</b></td>
               <td>String</td>
               <td></td>
               <td>No</td>
             </tr>
             <tr>
               <td><i>tiler_port</i></td>
-              <td>Port of the tiler URL. Default: <b>80</b> </td>
+              <td>Port of the tiler URL. Default: <b>"80"</b> </td>
+              <td>String</td>
+              <td></td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td><i>sql_protocol</i></td>
+              <td>SQL API protocol (opcional - default = <b>"http"</b>).</td>
+              <td>String</td>
+              <td></td>
+              <td>No</td>              
+            </tr>
+
+            <tr>
+              <td><i>sql_domain</i></td>
+              <td>SQL API domain (opcional - default = <b>"cartodb.com"</b>).</td>
+              <td>String</td>
+              <td></td>
+              <td>No</td>
+            </tr>
+
+            <tr>
+              <td><i>sql_port</i></td>
+              <td>SQL API port as a string (opcional - default = <b>"80"</b>).</td>
               <td>String</td>
               <td></td>
               <td>No</td>
@@ -372,6 +396,7 @@ var popup = new L.CartoDBPopup();
 ...
 featureMouseClick: function(ev,latlng,data) {
   // Set popup content
+  // You can pass an Object, an Array or a String
   popup.setContent(data);
 
   // Set latlng

@@ -1,6 +1,7 @@
 /* Some styles missed in central :( */
 table {font:normal 15px "Helvetica Neue","Helvetica",Arial; color:#666666;}  
 table tr {border-top: 1px solid #CCC; background-color:white; margin: 0; padding: 0;}
+table tr.separator {background:#E8E8E8;}
 table tr td {border: 1px solid #CCC; text-align: left; margin: 0; padding: 6px 13px;}
 table td b {color:#333333;}
 span.string p {display:inline-block; width:auto!important; font-size:13px;}

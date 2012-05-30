@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.44 [May 20, 2012]
+ * @version 0.45 [May 30, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -21,7 +21,13 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       opacity:        0.99,
       auto_bound:     false,
       debug:          false,
-      visible:        true
+      visible:        true,
+      tiler_domain:   "cartodb.com",
+      tiler_port:     "80",
+      tiler_protocol: "http",
+      sql_domain:     "cartodb.com",
+      sql_port:       "80",
+      sql_protocol:   "http"
     },
 
     /**
@@ -37,21 +43,27 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    featureMouseOver  -     Callback when user hovers a feature (return mouse event, latlng and feature data)
      *    featureMouseOut   -     Callback when user hovers out a feature
      *    featureMouseClick -     Callback when user clicks a feature (return mouse event, latlng and feature data)
+     *    debug             -     Get error messages from the library
+     *    auto_bound        -     Let cartodb auto-bound-zoom in the map (opcional - default = false)
+     *
      *    tiler_protocol    -     Tiler protocol (opcional - default = 'http')
      *    tiler_domain      -     Tiler domain (opcional - default = 'cartodb.com')
      *    tiler_port        -     Tiler port as a string (opcional - default = '80')
-     *    debug             -     Get error messages from the library
-     *    auto_bound        -     Let cartodb auto-bound-zoom in the map (opcional - default = false)
+     *    sql_protocol      -     SQL API protocol (opcional - default = 'http')
+     *    sql_domain        -     SQL API domain (opcional - default = 'cartodb.com')
+     *    sql_port          -     SQL API port as a string (opcional - default = '80')
      */
 
     initialize: function (options) {
-        
-      this.options.tiler_protocol = options.tiler_protocol || 'http';
-      this.options.tiler_domain = options.tiler_domain || 'cartodb.com';
-      this.options.tiler_port = options.tiler_port || '80';
-  
       // Set options
       L.Util.setOptions(this, options);
+
+      // Some checks
+      if (!options.table_name || !options.map) {
+        if (options.debug) {
+          throw('cartodb-leaflet needs at least a CartoDB table name and the Leaflet map object :(');
+        } else { return }
+      }
       
       // Bounds? CartoDB does it
       if (options.auto_bound)
@@ -87,6 +99,12 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @params {Integer} New opacity
      */
     setOpacity: function(opacity) {
+      if (isNaN(opacity) || opacity>1 || opacity<0) {
+        if (this.options.debug) {
+          throw(opacity + ' is not a valid value');
+        } else { return }
+      }
+
       this.layer.setOpacity(opacity);
     },
 
@@ -96,6 +114,12 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @params {str} New sql for the tiles
      */
     setQuery: function(sql) {
+      if (!isNaN(sql)) {
+        if (this.options.debug) {
+         throw(sql + ' is not a valid query');
+        } else { return }
+      }
+
       // Set the new value to the layer options
       this.options.query = sql;
       this._update();
@@ -107,6 +131,12 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @params {style} New carto for the tiles
      */
     setStyle: function(style) {
+      if (!isNaN(style)) {
+        if (this.options.debug) {
+          throw(style + ' is not a valid style');
+        } else { return }
+      }
+
       // Set the new value to the layer options
       this.options.tile_style = style;
       this._update();
@@ -118,6 +148,12 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @params {Boolean | String} New sql for the request
      */
     setInteractivity: function(value) {
+      if (!isNaN(value)) {
+        if (this.options.debug) {
+          throw(value + ' is not a valid setInteractivity value');
+        } else { return }
+      }
+
       // Set the new value to the layer options
       this.options.interactivity = value;
       // Update tiles
@@ -142,6 +178,12 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @params {Boolean} Choose if wants interaction or not
      */
     setInteraction: function(bool) {
+      if (bool !== false && bool !== true) {
+        if (this.options.debug) {
+          throw(bool + ' is not a valid setInteraction value');
+        } else { return }
+      }
+
       if (this.interaction) {
         if (bool) {
           var self = this;
@@ -221,7 +263,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     _setBounds: function() {
       var self = this;
       reqwest({
-        url: this.generateUrl() + '/api/v1/sql/?q='+escape('select ST_Extent(the_geom) from '+ this.options.table_name),
+        url: this.generateUrl("sql") + '/api/v2/sql/?q='+escape('select ST_Extent(the_geom) from '+ this.options.table_name),
         type: 'jsonp',
         jsonpCallback: 'callback',
         success: function(result) {
@@ -289,7 +331,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         , query = encodeURIComponent(this.options.query.replace(/\{\{table_name\}\}/g,this.options.table_name));
 
       // Add the cartodb tiles
-      var cartodb_url = this.generateUrl() + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}.png?sql=' + query +'&style=' + tile_style;
+      var cartodb_url = this.generateUrl("tiler") + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}.png?sql=' + query +'&style=' + tile_style;
       this.layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB', opacity: this.options.opacity});
 
       this.options.map.addLayer(this.layer,false);
@@ -355,7 +397,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @return {Object} Options for L.TileLayer
      */
     _generateTileJson: function () {
-      var core_url = this.generateUrl();  
+      var core_url = this.generateUrl("tiler");  
       var base_url = core_url + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}';
       var tile_url = base_url + '.png';
       var grid_url = base_url + '.grid.json';
@@ -441,16 +483,26 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @return {String} Tile url parsed
      */
     _addUrlData: function (url, data) {
-        url += (this._parseUri(url).query) ? '&' : '?';
-        return url += data;
+      url += (this._parseUri(url).query) ? '&' : '?';
+      return url += data;
     },
     
     /**
      * Generate a URL for the tiler
      * @params {String} Options including tiler_protocol, user_name, tiler_domain and tiler_port
      */    
-    generateUrl: function( options ){
-        return options.tiler_protocol + '://' + options.user_name + '.' + options.tiler_domain + ':' + options.tiler_port;
+    generateUrl: function(type){
+      if (type == "sql") {
+         return this.options.sql_protocol + 
+             "://" + ((this.options.user_name)?this.options.user_name+".":"")  + 
+             this.options.sql_domain + 
+             ((this.options.sql_port != "") ? (":" + this.options.sql_port) : "");
+       } else {
+         return this.options.tiler_protocol + 
+             "://" + ((this.options.user_name)?this.options.user_name+".":"")  + 
+             this.options.tiler_domain + 
+             ((this.options.tiler_port != "") ? (":" + this.options.tiler_port) : "");
+       }
     }
     
   });
