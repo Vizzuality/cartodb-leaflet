@@ -137,6 +137,7 @@ L.CartoDBPopup = L.Class.extend({
       closeButton.innerHTML = 'x';
 
       L.DomEvent.addListener(closeButton, 'click', this._onCloseButtonClick, this);
+      L.DomEvent.addListener(closeButton, 'touchend', this._onCloseButtonClick, this);
       L.DomEvent.disableClickPropagation(closeButton);
     }
 
