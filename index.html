@@ -36,7 +36,7 @@
     <div class="background floating">
       <section class="shadow top">
         <div class="content">
-          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.45</em></hgroup>
+          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.47</em></hgroup>
         </div>
         <div class="content no_padding border code">
 
@@ -44,7 +44,7 @@
           <!--[if lt IE 9]> <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /> <![endif]-->
           <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
           <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-          <script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"></script>
+          <script type="text/javascript" src="js/wax.leaf.min-6.0.5-touched.js"></script>
           <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
 
           <script type="text/javascript">
@@ -79,17 +79,17 @@
                 map: map,
                 user_name:"examples",
                 table_name: 'earthquakes',
-                query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
+                query: "SELECT cartodb_id,the_geom_webmercator,the_geom,magnitude FROM {{table_name}}",
                 tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
                 opacity: 0.8,
                 interactivity: "cartodb_id, magnitude",
-                featureMouseOver: function(ev,latlng,data) {
+                featureOver: function(ev,latlng,pos,data) {
                   document.body.style.cursor = "pointer";
                 },
-                featureMouseOut: function() {
+                featureOut: function() {
                   document.body.style.cursor = "default";
                 },
-                featureMouseClick: function(ev,latlng,data) {
+                featureClick: function(ev,latlng,pos,data) {
                   // Set popup content
                   var html = '';
                   for(var column in data) {
@@ -193,30 +193,32 @@
               <td>No</td>
             </tr>
             <tr>
-              <td><i>featureMouseOver</i></td>
+              <td><i>featureOver</i></td>
               <td>A callback when hovers in a feature</td>
               <td>Function</td>
               <td>
                 <b>event:</b> Mouse event object<br/>
                 <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
+                <b>pos:</b> Object with x and y position in the DOM map element<br/>
                 <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
               </td>
               <td>No (But only will work with <i>interactivity</i> specified)</td>
             </tr>
             <tr>
-              <td><i>featureMouseOut</i></td>
+              <td><i>featureOut</i></td>
               <td>A callback when hovers out a feature</td>
               <td>Function</td>
               <td></td>
               <td>No (But only will work with <i>interactivity</i> specified)</td>
             </tr>
             <tr>
-              <td><i>featureMouseClick</i></td>
+              <td><i>featureClick</i></td>
               <td>A callback when clicks in a feature</td>
               <td>Function</td>
               <td>
                 <b>event:</b> Mouse event object<br/>
                 <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
+                <b>pos:</b> Object with x and y position in the DOM map element<br/>
                 <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
               </td>
               <td>No (But only will work with <i>interactivity</i> specified)</td>
@@ -302,7 +304,7 @@
 &#60;!--[if lt IE 9]&#62; &#60;link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /&#62; &#60;![endif]--&#62;
 &#60;link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css"&#62;
 &#60;script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"&#62;&#60;/script&#62;
-&#60;script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"&#62;&#60;/script&#62;
+&#60;script type="text/javascript" src="js/wax.leaf.min-6.0.5-touched.js"&#62;&#60;/script&#62;
 &#60;script type="text/javascript" src="dist/cartodb-leaflet-min.js"&#62;&#60;/script&#62;
           </pre>
 
@@ -327,7 +329,9 @@ var cartodb_leaflet = new L.CartoDBLayer({
   query: "SELECT * FROM {{table_name}}",
   tile_style: "#{{table_name}}{marker-fill:red}",
   interactivity: "cartodb_id, magnitude",
-  featureMouseClick: function(ev, latlng, data) {alert(data)}
+  featureClick: function(ev, latlng, pos, data) {alert(data)},
+  featureOut: function() {},
+  featureOver: function(ev, latlng, pos, data) {},
   auto_bound: true
 });
           </pre>
@@ -376,6 +380,10 @@ var cartodb_leaflet = new L.CartoDBLayer({
               <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");</pre>
             </li>
             <li class="margin15" style="display:block">
+              <p class="light"><b>setBounds</b>:  Set bounds in the map using a new query or the default one</p>
+              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setBounds(); || cartodb_leaflet.setBounds("SELECT * FROM {{table_name}} WHERE cartodb_id < 100"); </pre>
+            </li>
+            <li class="margin15" style="display:block">
               <p class="light"><b>setLayerOrder</b>:  _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505</p>
             </li>
           </ul>
@@ -394,7 +402,7 @@ var popup = new L.CartoDBPopup();
           <p class="light margin15">And then use as you want:</p>
           <pre data-language="javascript">
 ...
-featureMouseClick: function(ev,latlng,data) {
+featureClick: function(ev,latlng,pos,data) {
   // Set popup content
   // You can pass an Object, an Array or a String
   popup.setContent(data);

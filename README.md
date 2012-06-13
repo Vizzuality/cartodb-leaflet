@@ -4,32 +4,9 @@
 This library allows you to use your own CartoDB tables with Laeflet.
 
 
-# Creating an example
-
-You will need to load these files to run the library:
-
-  - [Leaflet library](http://github.com/CloudMade/Leaflet/blob/master/dist/leaflet.js)
-  - [Leaflet css theme](http://github.com/CloudMade/Leaflet/tree/master/dist/leaflet.css)
-  - [Wax for Leaflet](https://github.com/mapbox/wax) 
-  - [CartoDB library for Leaflet](https://github.com/Vizzuality/cartodb-leaflet/blob/gh-pages/cartodb-leaflet-min.js)
-
-Html(*):
-
-```html
-<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-<!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
-<script type="text/javascript" src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-<script type="text/javascript" src="wax.leaf.min-6.0.0-beta2.js"></script>
-<script type="text/javascript" src="cartodb-leaflet-min.js"></script>
-```
-* We strongly recommend to use the library files we have in this repository, they are fully tested.
-
-
-
 # Using the library
 
 Using the library is really easy. It accepts the following parameters to manage the behavior of your CartoDB layers:
-
 
 <table>
 <tr>
@@ -89,19 +66,20 @@ Using the library is really easy. It accepts the following parameters to manage 
 </tr>
 
 <tr>
-<td>featureMouseOver</td>
+<td>featureOver</td>
 <td>A callback when hovers in a feature</td>
 <td>Function</td>
 <td>
   <b>event:</b> Mouse event object<br/>
   <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
+  <b>pos:</b> Object with x and y position in the DOM map element<br/>
   <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
 </td>
 <td>No (But only will work with `interactivity` specified)</td>
 </tr>
 
 <tr>
-<td>featureMouseOut</td>
+<td>featureOut</td>
 <td>A callback when hovers out a feature</td>
 <td>Function</td>
 <td></td>
@@ -109,12 +87,13 @@ Using the library is really easy. It accepts the following parameters to manage 
 </tr>
 
 <tr>
-<td>featureMouseClick</td>
+<td>featureClick</td>
 <td>A callback when clicks in a feature</td>
 <td>Function</td>
 <td>
   <b>event:</b> Mouse event object<br/>
   <b>latlng:</b> The LatLng leaflet object where was clicked<br/>
+  <b>pos:</b> Object with x and y position in the DOM map element<br/>
   <b>data:</b> The CartoDB data of the clicked feature with the `interactivity` param.
 </td>
 <td>No (But only will work with `interactivity` specified)</td>
@@ -200,9 +179,12 @@ If you want to get a feature clicked || hover data (via the `interactivity` para
 If you don't want to write the name of the table several times, you can use {{table_name}} in the `query` or `tile_style` parameters.
 We strongly recommend the use of the files available in this repository. These are tested, and if you decide use updated ones, the library could not work.
 
-# Example
+
+# Creating an example
+
 
 Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/custompopup.html)!
+
 
 First of all add the necessary script and css files:
 
@@ -211,10 +193,12 @@ First of all add the necessary script and css files:
 <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
 <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
 <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-<script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"></script>
+<script type="text/javascript" src="js/wax.leaf.min-6.0.5-touched.js"></script>
 <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
 <script type="text/javascript" src="dist/cartodb-popup.js"></script>
 ```
+* We strongly recommend to use the library files we have in this repository, they are fully tested.
+
 
 When the document is loaded, start creating the map:
 
@@ -226,7 +210,7 @@ var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D7597
 map.addLayer(cloudmade);
 ```
   
-When the document is loaded, start creating the map:
+After that, create the CartoDB layer:
 
 ```javascript
 var cartodb_leaflet = new L.CartoDBLayer({
@@ -236,7 +220,7 @@ var cartodb_leaflet = new L.CartoDBLayer({
   query: "SELECT * FROM {{table_name}}",
   tile_style: "#{{table_name}}{marker-fill:red}",
   interactivity: "cartodb_id, magnitude",
-  featureMouseClick: function(ev, latlng, data) {alert(data)}
+  featureClick: function(ev, latlng, pos, data) {alert(data)}
   auto_bound: true
 });
 ```
@@ -270,4 +254,6 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.isVisible();```
 - **setInteractivity**: Change the columns you want to get data (it needs to reload the tiles)
     Example: ```cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");```
+- **setBounds**: Set bounds in the map using a new query or the default one
+    Example: ```cartodb_leaflet.setBounds(); || cartodb_leaflet.setBounds("SELECT * FROM {{table_name}} WHERE cartodb_id < 100");```
 - **setLayerOrder**: _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505

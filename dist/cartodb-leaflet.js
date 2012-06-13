@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.45 [May 30, 2012]
+ * @version 0.47 [June 13, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -40,9 +40,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    opacity           -     If you want to change the opacity of the CartoDB layer
      *    tile_style        -     If you want to add other style to the layer
      *    interactivity     -     Get data from the feature clicked ( without any request :) )
-     *    featureMouseOver  -     Callback when user hovers a feature (return mouse event, latlng and feature data)
-     *    featureMouseOut   -     Callback when user hovers out a feature
-     *    featureMouseClick -     Callback when user clicks a feature (return mouse event, latlng and feature data)
+     *    featureOver       -     Callback when user hovers a feature (return mouse event, latlng, position (x & y) and feature data)
+     *    featureOut        -     Callback when user hovers out a feature
+     *    featureClick      -     Callback when user clicks a feature (return mouse/touch event, latlng, position (x & y) and feature data)
      *    debug             -     Get error messages from the library
      *    auto_bound        -     Let cartodb auto-bound-zoom in the map (opcional - default = false)
      *
@@ -67,7 +67,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       
       // Bounds? CartoDB does it
       if (options.auto_bound)
-        this._setBounds();
+        this.setBounds();
 
       // Add cartodb logo, yes sir!
       this._addWadus(); 
@@ -260,22 +260,31 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     /**
      * Zoom to cartodb geometries
      */
-    _setBounds: function() {
-      var self = this;
+    setBounds: function(sql) {
+      var self = this
+        , query = "";
+
+      if (sql) {
+        // Custom query
+        query = sql;
+      } else {
+        // Already defined query
+        query = this.options.query;
+      }
+
       reqwest({
-        url: this.generateUrl("sql") + '/api/v2/sql/?q='+escape('select ST_Extent(the_geom) from '+ this.options.table_name),
+        url: this.generateUrl("sql") + '/api/v2/sql/?q='+escape('SELECT ST_XMin(ST_Extent(the_geom)) as minx,ST_YMin(ST_Extent(the_geom)) as miny,'+
+          'ST_XMax(ST_Extent(the_geom)) as maxx,ST_YMax(ST_Extent(the_geom)) as maxy from ('+ query.replace(/\{\{table_name\}\}/g,this.options.table_name) + ') as subq'),
         type: 'jsonp',
         jsonpCallback: 'callback',
         success: function(result) {
-          if (result.rows[0].st_extent!=null) {
-            var coordinates = result.rows[0].st_extent.replace('BOX(','').replace(')','').split(',');
-            var coor1 = coordinates[0].split(' ');
-            var coor2 = coordinates[1].split(' ');
+          if (result.rows[0].maxx!=null) {
+            var coordinates = result.rows[0];
 
-            var lon0 = coor1[0];
-            var lat0 = coor1[1];
-            var lon1 = coor2[0];
-            var lat1 = coor2[1];
+            var lon0 = coordinates.maxx;
+            var lat0 = coordinates.maxy;
+            var lon1 = coordinates.minx;
+            var lat1 = coordinates.miny;
 
             var minlat = -85.0511;
             var maxlat =  85.0511;
@@ -356,10 +365,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         .tilejson(this.tilejson)
         .on('on',function(o) {self._bindWaxEvents(self.options.map,o)})
         .on('off', function(){
-          if (self.options.featureMouseOut) {
-            return self.options.featureMouseOut && self.options.featureMouseOut();
+          if (self.options.featureOut) {
+            return self.options.featureOut && self.options.featureOut();
           } else {
-            if (self.options.debug) throw('featureMouseOut function not defined');
+            if (self.options.debug) throw('featureOut function not defined');
           }
         });
     },
@@ -371,20 +380,26 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @param {Event} Wax event
      */
     _bindWaxEvents: function(map,o) {
-      var container_point = map.mouseEventToLayerPoint(o.e)
-        , latlng = map.layerPointToLatLng(container_point);
+      var layer_point = this._findPos(map,o)
+        , latlng = map.layerPointToLatLng(layer_point);
 
       switch (o.e.type) {
-        case 'mousemove': if (this.options.featureMouseOver) {
-                            return this.options.featureMouseOver(o.e,latlng,o.data);
+        case 'mousemove': if (this.options.featureOver) {
+                            return this.options.featureOver(o.e,latlng,o.pos,o.data);
                           } else {
-                            if (this.options.debug) throw('featureMouseOver function not defined');
+                            if (this.options.debug) throw('featureOver function not defined');
                           }
                           break;
-        case 'mouseup':   if (this.options.featureMouseClick) {
-                            this.options.featureMouseClick(o.e,latlng,o.data);
+        case 'click':   if (this.options.featureClick) {
+                            this.options.featureClick(o.e,latlng,o.pos,o.data);
                           } else {
-                            if (this.options.debug) throw('featureMouseClick function not defined');
+                            if (this.options.debug) throw('featureClick function not defined');
+                          }
+                          break;
+        case 'touchend':  if (this.options.featureClick) {
+                            this.options.featureClick(o.e,latlng,o.pos,o.data);
+                          } else {
+                            if (this.options.debug) throw('featureClick function not defined');
                           }
                           break;
         default:          break;
@@ -503,6 +518,23 @@ if (typeof(L.CartoDBLayer) === "undefined") {
              this.options.tiler_domain + 
              ((this.options.tiler_port != "") ? (":" + this.options.tiler_port) : "");
        }
+    },
+
+
+    _findPos: function (map,o) {
+      var curleft = curtop = 0;
+      var obj = map._container;
+      if (obj.offsetParent) {
+        // Modern browsers
+        do {
+          curleft += obj.offsetLeft;
+          curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+        return map.containerPointToLayerPoint(new L.Point(o.pos.x - curleft,o.pos.y - curtop))
+      } else {
+        // IE
+        return map.mouseEventToLayerPoint(o.e)
+      }
     }
     
   });

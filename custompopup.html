@@ -5,29 +5,24 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
   <title>Using CartoDB with Leaflet and custom infowindow</title>
   <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
-  <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map {height:100%;}</style>
+  <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map {margin:100px 0 0 0; height:50%;} .leaflet-container {background:#A7BDDE!important;}</style>
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
   <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
   <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-  <script type="text/javascript" src="js/wax.leaf.min-6.0.0-beta2.js"></script>
+  <script type="text/javascript" src="js/wax.leaf.min-6.0.5-touched.js"></script>
   <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
   <script type="text/javascript" src="dist/cartodb-popup-min.js"></script>
 
   <script type="text/javascript">
 
     function initialize() {
+      // Create map
       var map = new L.Map('map').setView(new L.LatLng(20,0), 3);
-
-      var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-      cloudmadeAttrib = 'Map data &copy; 2012 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
-      cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
-      map.addLayer(cloudmade,true);
-
 
       // Create a CartoDB popup
       var popup = new L.CartoDBPopup();
-
 
       // First cartodb layer, countries
       var cartodb_leaflet1 = new L.CartoDBLayer({
@@ -47,17 +42,16 @@
         map: map,
         user_name:"examples",
         table_name: 'earthquakes',
-        query: "SELECT cartodb_id,the_geom_webmercator,magnitude FROM {{table_name}}",
+        query: "SELECT cartodb_id,the_geom_webmercator,the_geom,magnitude FROM {{table_name}}",
         tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
-        opacity: 0.8,
         interactivity: "cartodb_id, magnitude",
-        featureMouseOver: function(ev,latlng,data) {
+        featureOver: function(ev,latlng,pos,data) {
           document.body.style.cursor = "pointer";
         },
-        featureMouseOut: function() {
+        featureOut: function() {
           document.body.style.cursor = "default";
         },
-        featureMouseClick: function(ev,latlng,data) {
+        featureClick: function(ev,latlng,pos,data) {
           // Set popup content
           popup.setContent(data);
 
