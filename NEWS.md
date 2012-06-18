@@ -1,3 +1,5 @@
+  [v 0.48]
+    - New function, setOptions, to change any param at the same time.
 
   [v 0.47]
     - Touch events supported

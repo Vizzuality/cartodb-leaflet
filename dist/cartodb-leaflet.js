@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.47 [June 13, 2012]
+ * @version 0.48 [June 18, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -192,6 +192,24 @@ if (typeof(L.CartoDBLayer) === "undefined") {
           this.interaction.off('on');
         }
       }
+    },
+
+    /**
+     * Change multiple options at the same time
+     * @params {Object} New options object
+     */
+    setOptions: function(options) {
+      if (typeof options!= "object" || options.length) {
+        if (this.options.debug) {
+          throw(options + ' options has to be an object');
+        } else { return }
+      }
+
+      // Set options
+      L.Util.setOptions(this, options);
+
+      // Update tiles
+      this._update();
     },
 
 

@@ -36,7 +36,7 @@
     <div class="background floating">
       <section class="shadow top">
         <div class="content">
-          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.47</em></hgroup>
+          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.48</em></hgroup>
         </div>
         <div class="content no_padding border code">
 
@@ -382,6 +382,10 @@ var cartodb_leaflet = new L.CartoDBLayer({
             <li class="margin15" style="display:block">
               <p class="light"><b>setBounds</b>:  Set bounds in the map using a new query or the default one</p>
               <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setBounds(); || cartodb_leaflet.setBounds("SELECT * FROM {{table_name}} WHERE cartodb_id < 100"); </pre>
+            </li>
+            <li class="margin15" style="display:block">
+              <p class="light"><b>setOptions</b>:  Change any parameter at the same time refreshing the tiles once</p>
+              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setOptions({query: "SELECT * FROM {{table_name}} WHERE cartodb_id<100", interactivity: "cartodb_id,the_geom,magnitude"});</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setLayerOrder</b>:  _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505</p>

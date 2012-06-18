@@ -256,4 +256,6 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");```
 - **setBounds**: Set bounds in the map using a new query or the default one
     Example: ```cartodb_leaflet.setBounds(); || cartodb_leaflet.setBounds("SELECT * FROM {{table_name}} WHERE cartodb_id < 100");```
+- **setOptions**: Change any parameter at the same time refreshing the tiles once
+    Example: ```cartodb_leaflet.setOptions({query: "SELECT * FROM {{table_name}} WHERE cartodb_id<100", interactivity: "cartodb_id,the_geom,magnitude"});```
 - **setLayerOrder**: _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505
