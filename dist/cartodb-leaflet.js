@@ -194,6 +194,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       }
     },
 
+
     /**
      * Change multiple options at the same time
      * @params {Object} New options object
@@ -520,6 +521,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       return url += data;
     },
     
+
     /**
      * Generate a URL for the tiler
      * @params {String} Options including tiler_protocol, user_name, tiler_domain and tiler_port
@@ -539,6 +541,11 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     },
 
 
+    /**
+     * Get the google maps Point of the event
+     * @params {Object} Map object
+     * @params {Object} Wax event object
+     */
     _findPos: function (map,o) {
       var curleft = curtop = 0;
       var obj = map._container;
