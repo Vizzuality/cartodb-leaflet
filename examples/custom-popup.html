@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>CartoDB + Leaflet | Custom infowindow</title>
+  <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+  <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map {height:100%;}</style>
+  <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+  <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+  <link  href="../css/style.css" rel="stylesheet" type="text/css">
+  <link  href="../css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+  <script type="text/javascript" src="../js/wax.leaf.min-6.0.5-touched.js"></script>
+  <script type="text/javascript" src="../dist/cartodb-leaflet-min.js"></script>
+  <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script>
+
+  <script type="text/javascript">
+    function initialize() {
+      var map = new L.Map('map').setView(new L.LatLng(43.718379593199494, -3.99772644042969), 4)
+        , mapboxUrl = 'http://{s}.tiles.mapbox.com/v3/cartodb.map-1nh578vv/{z}/{x}/{y}.png'
+        , mapbox = new L.TileLayer(mapboxUrl, {maxZoom: 18, attribution: "Powered by Leaflet and Mapbox"});
+      map.addLayer(mapbox,true);
+
+      // Create a CartoDB popup
+      var popup = new L.CartoDBPopup();
+
+      // Now the CartoDB layer, the earthquakes
+      var earthquakes = new L.CartoDBLayer({
+        map: map,
+        user_name:"examples",
+        table_name: 'earthquakes',
+        query: "SELECT cartodb_id,the_geom_webmercator,the_geom,magnitude FROM {{table_name}}",
+        tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
+        interactivity: "cartodb_id, magnitude",
+        featureOver: function(ev,latlng,pos,data) {
+          document.body.style.cursor = "pointer";
+        },
+        featureOut: function() {
+          document.body.style.cursor = "default";
+        },
+        featureClick: function(ev,latlng,pos,data) {
+          ev.stopPropagation();
+          // Set popup content
+          popup.setContent(data);
+
+          // Set latlng
+          popup.setLatLng(latlng);
+
+          // Show it!
+          map.openPopup(popup);
+        },
+        auto_bound: false,
+        debug: true
+      });
+      // Adding layer to map
+      map.addLayer(earthquakes);
+    }
+  </script>
+</head>
+<body onload="initialize()">
+  <div id="map"></div>
+</body>
+</html>

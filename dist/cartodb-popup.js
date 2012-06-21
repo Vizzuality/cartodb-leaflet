@@ -1,7 +1,7 @@
 
 /**
  * @name cartodb-popup
- * @version 1.0 [May 18, 2012]
+ * @version 1.1 [June 21, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -130,6 +130,9 @@ L.CartoDBPopup = L.Class.extend({
     var prefix = 'cartodb-popup',
       container = this._container = L.DomUtil.create('div', prefix + ' ' + this.options.className),
       closeButton;
+
+    L.DomEvent.addListener(container, 'mousedown', L.DomEvent.stopPropagation);
+    L.DomEvent.addListener(container, 'touchend', L.DomEvent.stopPropagation);
 
     if (this.options.closeButton) {
       closeButton = this._closeButton = L.DomUtil.create('a', prefix + '-close-button', container);
