@@ -12,7 +12,7 @@
   <link  href="../css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-  <script type="text/javascript" src="../js/wax.leaf.js"></script>
+  <script type="text/javascript" src="../js/wax.leaf.min-6.2.3-touched.js"></script>
   <script type="text/javascript" src="../dist/cartodb-leaflet-min.js"></script>
   <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script>
 
@@ -28,7 +28,7 @@
         // Initialize hover polygon
         , polygon = new L.GeoJSON(null)
         // Hover polygon style
-        , polygon_style = {color: "#333", weight: 2, opacity:1, fillOpacity: 0, clickable:false}
+        , polygon_style = {color: "#333", weight: 2, opacity:1, fillOpacity: 1, fillColor:"#FFCC00", clickable:false}
         // Create the CartoDB layer
         , nyc_parks = new L.CartoDBLayer({
             map: map,

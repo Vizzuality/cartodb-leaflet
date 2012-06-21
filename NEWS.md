@@ -1,5 +1,7 @@
+
 [v 0.48]
 - New function, setOptions, to change any param at the same time.
+- Wax 6.2.3 touched and added.
 
 [v 0.47]
 - Touch events supported

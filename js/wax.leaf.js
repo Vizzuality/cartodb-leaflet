@@ -3300,6 +3300,7 @@ wax.leaf.connector = L.TileLayer.extend({
         options = options || {};
         options.minZoom = options.minzoom || 0;
         options.maxZoom = options.maxzoom || 22;
+        options.opacity = options.opacity || 1;
         L.TileLayer.prototype.initialize.call(this, options.tiles[0], options);
     }
 });
