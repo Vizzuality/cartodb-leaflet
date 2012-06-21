@@ -1,4 +1,4 @@
-/* wax - 6.0.5 - 1.0.4-578-g34450e6 */
+/* wax - 6.2.3 - 1.0.4-590-gcd05aa2 */
 
 
 !function (name, context, definition) {
@@ -1469,411 +1469,563 @@ if (typeof window !== 'undefined') {
 // Loosen restrictions of Caja's
 // html-sanitizer to allow for styling
 html4.ATTRIBS['*::style'] = 0;
-html4.ATTRIBS['a::target'] = 0;
 html4.ELEMENTS['style'] = 0;
-/*
-  mustache.js — Logic-less templates in JavaScript
 
-  See http://mustache.github.com/ for more info.
-*/
+html4.ATTRIBS['a::target'] = 0;
 
-var Mustache = function() {
-  var regexCache = {};
-  var Renderer = function() {};
+html4.ELEMENTS['video'] = 0;
+html4.ATTRIBS['video::src'] = 0;
+html4.ATTRIBS['video::poster'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
 
-  Renderer.prototype = {
-    otag: "{{",
-    ctag: "}}",
-    pragmas: {},
-    buffer: [],
-    pragmas_implemented: {
-      "IMPLICIT-ITERATOR": true
-    },
-    context: {},
+html4.ELEMENTS['audio'] = 0;
+html4.ATTRIBS['audio::src'] = 0;
+html4.ATTRIBS['video::autoplay'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
+/*!
+ * mustache.js - Logic-less {{mustache}} templates with JavaScript
+ * http://github.com/janl/mustache.js
+ */
+var Mustache = (typeof module !== "undefined" && module.exports) || {};
 
-    render: function(template, context, partials, in_recursion) {
-      // reset buffer & set context
-      if(!in_recursion) {
-        this.context = context;
-        this.buffer = []; // TODO: make this non-lazy
-      }
+(function (exports) {
 
-      // fail fast
-      if(!this.includes("", template)) {
-        if(in_recursion) {
-          return template;
-        } else {
-          this.send(template);
-          return;
-        }
-      }
+  exports.name = "mustache.js";
+  exports.version = "0.5.0-dev";
+  exports.tags = ["{{", "}}"];
+  exports.parse = parse;
+  exports.compile = compile;
+  exports.render = render;
+  exports.clearCache = clearCache;
 
-      // get the pragmas together
-      template = this.render_pragmas(template);
+  // This is here for backwards compatibility with 0.4.x.
+  exports.to_html = function (template, view, partials, send) {
+    var result = render(template, view, partials);
 
-      // render the template
-      var html = this.render_section(template, context, partials);
-
-      // render_section did not find any sections, we still need to render the tags
-      if (html === false) {
-        html = this.render_tags(template, context, partials, in_recursion);
-      }
-
-      if (in_recursion) {
-        return html;
-      } else {
-        this.sendLines(html);
-      }
-    },
-
-    /*
-      Sends parsed lines
-    */
-    send: function(line) {
-      if(line !== "") {
-        this.buffer.push(line);
-      }
-    },
-
-    sendLines: function(text) {
-      if (text) {
-        var lines = text.split("\n");
-        for (var i = 0; i < lines.length; i++) {
-          this.send(lines[i]);
-        }
-      }
-    },
-
-    /*
-      Looks for %PRAGMAS
-    */
-    render_pragmas: function(template) {
-      // no pragmas
-      if(!this.includes("%", template)) {
-        return template;
-      }
-
-      var that = this;
-      var regex = this.getCachedRegex("render_pragmas", function(otag, ctag) {
-        return new RegExp(otag + "%([\\w-]+) ?([\\w]+=[\\w]+)?" + ctag, "g");
-      });
-
-      return template.replace(regex, function(match, pragma, options) {
-        if(!that.pragmas_implemented[pragma]) {
-          throw({message:
-            "This implementation of mustache doesn't understand the '" +
-            pragma + "' pragma"});
-        }
-        that.pragmas[pragma] = {};
-        if(options) {
-          var opts = options.split("=");
-          that.pragmas[pragma][opts[0]] = opts[1];
-        }
-        return "";
-        // ignore unknown pragmas silently
-      });
-    },
-
-    /*
-      Tries to find a partial in the curent scope and render it
-    */
-    render_partial: function(name, context, partials) {
-      name = this.trim(name);
-      if(!partials || partials[name] === undefined) {
-        throw({message: "unknown_partial '" + name + "'"});
-      }
-      if(typeof(context[name]) != "object") {
-        return this.render(partials[name], context, partials, true);
-      }
-      return this.render(partials[name], context[name], partials, true);
-    },
-
-    /*
-      Renders inverted (^) and normal (#) sections
-    */
-    render_section: function(template, context, partials) {
-      if(!this.includes("#", template) && !this.includes("^", template)) {
-        // did not render anything, there were no sections
-        return false;
-      }
-
-      var that = this;
-
-      var regex = this.getCachedRegex("render_section", function(otag, ctag) {
-        // This regex matches _the first_ section ({{#foo}}{{/foo}}), and captures the remainder
-        return new RegExp(
-          "^([\\s\\S]*?)" +         // all the crap at the beginning that is not {{*}} ($1)
-
-          otag +                    // {{
-          "(\\^|\\#)\\s*(.+)\\s*" + //  #foo (# == $2, foo == $3)
-          ctag +                    // }}
-
-          "\n*([\\s\\S]*?)" +       // between the tag ($2). leading newlines are dropped
-
-          otag +                    // {{
-          "\\/\\s*\\3\\s*" +        //  /foo (backreference to the opening tag).
-          ctag +                    // }}
-
-          "\\s*([\\s\\S]*)$",       // everything else in the string ($4). leading whitespace is dropped.
-
-        "g");
-      });
-
-
-      // for each {{#foo}}{{/foo}} section do...
-      return template.replace(regex, function(match, before, type, name, content, after) {
-        // before contains only tags, no sections
-        var renderedBefore = before ? that.render_tags(before, context, partials, true) : "",
-
-        // after may contain both sections and tags, so use full rendering function
-            renderedAfter = after ? that.render(after, context, partials, true) : "",
-
-        // will be computed below
-            renderedContent,
-
-            value = that.find(name, context);
-
-        if (type === "^") { // inverted section
-          if (!value || that.is_array(value) && value.length === 0) {
-            // false or empty list, render it
-            renderedContent = that.render(content, context, partials, true);
-          } else {
-            renderedContent = "";
-          }
-        } else if (type === "#") { // normal section
-          if (that.is_array(value)) { // Enumerable, Let's loop!
-            renderedContent = that.map(value, function(row) {
-              return that.render(content, that.create_context(row), partials, true);
-            }).join("");
-          } else if (that.is_object(value)) { // Object, Use it as subcontext!
-            renderedContent = that.render(content, that.create_context(value),
-              partials, true);
-          } else if (typeof value === "function") {
-            // higher order section
-            renderedContent = value.call(context, content, function(text) {
-              return that.render(text, context, partials, true);
-            });
-          } else if (value) { // boolean section
-            renderedContent = that.render(content, context, partials, true);
-          } else {
-            renderedContent = "";
-          }
-        }
-
-        return renderedBefore + renderedContent + renderedAfter;
-      });
-    },
-
-    /*
-      Replace {{foo}} and friends with values from our view
-    */
-    render_tags: function(template, context, partials, in_recursion) {
-      // tit for tat
-      var that = this;
-
-
-
-      var new_regex = function() {
-        return that.getCachedRegex("render_tags", function(otag, ctag) {
-          return new RegExp(otag + "(=|!|>|\\{|%)?([^\\/#\\^]+?)\\1?" + ctag + "+", "g");
-        });
-      };
-
-      var regex = new_regex();
-      var tag_replace_callback = function(match, operator, name) {
-        switch(operator) {
-        case "!": // ignore comments
-          return "";
-        case "=": // set new delimiters, rebuild the replace regexp
-          that.set_delimiters(name);
-          regex = new_regex();
-          return "";
-        case ">": // render partial
-          return that.render_partial(name, context, partials);
-        case "{": // the triple mustache is unescaped
-          return that.find(name, context);
-        default: // escape the value
-          return that.escape(that.find(name, context));
-        }
-      };
-      var lines = template.split("\n");
-      for(var i = 0; i < lines.length; i++) {
-        lines[i] = lines[i].replace(regex, tag_replace_callback, this);
-        if(!in_recursion) {
-          this.send(lines[i]);
-        }
-      }
-
-      if(in_recursion) {
-        return lines.join("\n");
-      }
-    },
-
-    set_delimiters: function(delimiters) {
-      var dels = delimiters.split(" ");
-      this.otag = this.escape_regex(dels[0]);
-      this.ctag = this.escape_regex(dels[1]);
-    },
-
-    escape_regex: function(text) {
-      // thank you Simon Willison
-      if(!arguments.callee.sRE) {
-        var specials = [
-          '/', '.', '*', '+', '?', '|',
-          '(', ')', '[', ']', '{', '}', '\\'
-        ];
-        arguments.callee.sRE = new RegExp(
-          '(\\' + specials.join('|\\') + ')', 'g'
-        );
-      }
-      return text.replace(arguments.callee.sRE, '\\$1');
-    },
-
-    /*
-      find `name` in current `context`. That is find me a value
-      from the view object
-    */
-    find: function(name, context) {
-      name = this.trim(name);
-
-      // Checks whether a value is thruthy or false or 0
-      function is_kinda_truthy(bool) {
-        return bool === false || bool === 0 || bool;
-      }
-
-      var value;
-      if(is_kinda_truthy(context[name])) {
-        value = context[name];
-      } else if(is_kinda_truthy(this.context[name])) {
-        value = this.context[name];
-      }
-
-      if(typeof value === "function") {
-        return value.apply(context);
-      }
-      if(value !== undefined) {
-        return value;
-      }
-      // silently ignore unkown variables
-      return "";
-    },
-
-    // Utility methods
-
-    /* includes tag */
-    includes: function(needle, haystack) {
-      return haystack.indexOf(this.otag + needle) != -1;
-    },
-
-    /*
-      Does away with nasty characters
-    */
-    escape: function(s) {
-      s = String(s === null ? "" : s);
-      return s.replace(/&(?!\w+;)|["'<>\\]/g, function(s) {
-        switch(s) {
-        case "&": return "&amp;";
-        case '"': return '&quot;';
-        case "'": return '&#39;';
-        case "<": return "&lt;";
-        case ">": return "&gt;";
-        default: return s;
-        }
-      });
-    },
-
-    // by @langalex, support for arrays of strings
-    create_context: function(_context) {
-      if(this.is_object(_context)) {
-        return _context;
-      } else {
-        var iterator = ".";
-        if(this.pragmas["IMPLICIT-ITERATOR"]) {
-          iterator = this.pragmas["IMPLICIT-ITERATOR"].iterator;
-        }
-        var ctx = {};
-        ctx[iterator] = _context;
-        return ctx;
-      }
-    },
-
-    is_object: function(a) {
-      return a && typeof a == "object";
-    },
-
-    is_array: function(a) {
-      return Object.prototype.toString.call(a) === '[object Array]';
-    },
-
-    /*
-      Gets rid of leading and trailing whitespace
-    */
-    trim: function(s) {
-      return s.replace(/^\s*|\s*$/g, "");
-    },
-
-    /*
-      Why, why, why? Because IE. Cry, cry cry.
-    */
-    map: function(array, fn) {
-      if (typeof array.map == "function") {
-        return array.map(fn);
-      } else {
-        var r = [];
-        var l = array.length;
-        for(var i = 0; i < l; i++) {
-          r.push(fn(array[i]));
-        }
-        return r;
-      }
-    },
-
-    getCachedRegex: function(name, generator) {
-      var byOtag = regexCache[this.otag];
-      if (!byOtag) {
-        byOtag = regexCache[this.otag] = {};
-      }
-
-      var byCtag = byOtag[this.ctag];
-      if (!byCtag) {
-        byCtag = byOtag[this.ctag] = {};
-      }
-
-      var regex = byCtag[name];
-      if (!regex) {
-        regex = byCtag[name] = generator(this.otag, this.ctag);
-      }
-
-      return regex;
+    if (typeof send === "function") {
+      send(result);
+    } else {
+      return result;
     }
   };
 
-  return({
-    name: "mustache.js",
-    version: "0.4.0-dev",
+  var _toString = Object.prototype.toString;
+  var _isArray = Array.isArray;
+  var _forEach = Array.prototype.forEach;
+  var _trim = String.prototype.trim;
 
-    /*
-      Turns a template and view into HTML
-    */
-    to_html: function(template, view, partials, send_fun) {
-      var renderer = new Renderer();
-      if(send_fun) {
-        renderer.send = send_fun;
+  var isArray;
+  if (_isArray) {
+    isArray = _isArray;
+  } else {
+    isArray = function (obj) {
+      return _toString.call(obj) === "[object Array]";
+    };
+  }
+
+  var forEach;
+  if (_forEach) {
+    forEach = function (obj, callback, scope) {
+      return _forEach.call(obj, callback, scope);
+    };
+  } else {
+    forEach = function (obj, callback, scope) {
+      for (var i = 0, len = obj.length; i < len; ++i) {
+        callback.call(scope, obj[i], i, obj);
       }
-      renderer.render(template, view || {}, partials);
-      if(!send_fun) {
-        return renderer.buffer.join("\n");
+    };
+  }
+
+  var spaceRe = /^\s*$/;
+
+  function isWhitespace(string) {
+    return spaceRe.test(string);
+  }
+
+  var trim;
+  if (_trim) {
+    trim = function (string) {
+      return string == null ? "" : _trim.call(string);
+    };
+  } else {
+    var trimLeft, trimRight;
+
+    if (isWhitespace("\xA0")) {
+      trimLeft = /^\s+/;
+      trimRight = /\s+$/;
+    } else {
+      // IE doesn't match non-breaking spaces with \s, thanks jQuery.
+      trimLeft = /^[\s\xA0]+/;
+      trimRight = /[\s\xA0]+$/;
+    }
+
+    trim = function (string) {
+      return string == null ? "" :
+        String(string).replace(trimLeft, "").replace(trimRight, "");
+    };
+  }
+
+  var escapeMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+  };
+
+  function escapeHTML(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+      return escapeMap[s] || s;
+    });
+  }
+
+  /**
+   * Adds the `template`, `line`, and `file` properties to the given error
+   * object and alters the message to provide more useful debugging information.
+   */
+  function debug(e, template, line, file) {
+    file = file || "<template>";
+
+    var lines = template.split("\n"),
+        start = Math.max(line - 3, 0),
+        end = Math.min(lines.length, line + 3),
+        context = lines.slice(start, end);
+
+    var c;
+    for (var i = 0, len = context.length; i < len; ++i) {
+      c = i + start + 1;
+      context[i] = (c === line ? " >> " : "    ") + context[i];
+    }
+
+    e.template = template;
+    e.line = line;
+    e.file = file;
+    e.message = [file + ":" + line, context.join("\n"), "", e.message].join("\n");
+
+    return e;
+  }
+
+  /**
+   * Looks up the value of the given `name` in the given context `stack`.
+   */
+  function lookup(name, stack, defaultValue) {
+    if (name === ".") {
+      return stack[stack.length - 1];
+    }
+
+    var names = name.split(".");
+    var lastIndex = names.length - 1;
+    var target = names[lastIndex];
+
+    var value, context, i = stack.length, j, localStack;
+    while (i) {
+      localStack = stack.slice(0);
+      context = stack[--i];
+
+      j = 0;
+      while (j < lastIndex) {
+        context = context[names[j++]];
+
+        if (context == null) {
+          break;
+        }
+
+        localStack.push(context);
+      }
+
+      if (context && typeof context === "object" && target in context) {
+        value = context[target];
+        break;
       }
     }
-  });
-}();
+
+    // If the value is a function, call it in the current context.
+    if (typeof value === "function") {
+      value = value.call(localStack[localStack.length - 1]);
+    }
+
+    if (value == null)  {
+      return defaultValue;
+    }
+
+    return value;
+  }
+
+  function renderSection(name, stack, callback, inverted) {
+    var buffer = "";
+    var value =  lookup(name, stack);
+
+    if (inverted) {
+      // From the spec: inverted sections may render text once based on the
+      // inverse value of the key. That is, they will be rendered if the key
+      // doesn't exist, is false, or is an empty list.
+      if (value == null || value === false || (isArray(value) && value.length === 0)) {
+        buffer += callback();
+      }
+    } else if (isArray(value)) {
+      forEach(value, function (value) {
+        stack.push(value);
+        buffer += callback();
+        stack.pop();
+      });
+    } else if (typeof value === "object") {
+      stack.push(value);
+      buffer += callback();
+      stack.pop();
+    } else if (typeof value === "function") {
+      var scope = stack[stack.length - 1];
+      var scopedRender = function (template) {
+        return render(template, scope);
+      };
+      buffer += value.call(scope, callback(), scopedRender) || "";
+    } else if (value) {
+      buffer += callback();
+    }
+
+    return buffer;
+  }
+
+  /**
+   * Parses the given `template` and returns the source of a function that,
+   * with the proper arguments, will render the template. Recognized options
+   * include the following:
+   *
+   *   - file     The name of the file the template comes from (displayed in
+   *              error messages)
+   *   - tags     An array of open and close tags the `template` uses. Defaults
+   *              to the value of Mustache.tags
+   *   - debug    Set `true` to log the body of the generated function to the
+   *              console
+   *   - space    Set `true` to preserve whitespace from lines that otherwise
+   *              contain only a {{tag}}. Defaults to `false`
+   */
+  function parse(template, options) {
+    options = options || {};
+
+    var tags = options.tags || exports.tags,
+        openTag = tags[0],
+        closeTag = tags[tags.length - 1];
+
+    var code = [
+      'var buffer = "";', // output buffer
+      "\nvar line = 1;", // keep track of source line number
+      "\ntry {",
+      '\nbuffer += "'
+    ];
+
+    var spaces = [],      // indices of whitespace in code on the current line
+        hasTag = false,   // is there a {{tag}} on the current line?
+        nonSpace = false; // is there a non-space char on the current line?
+
+    // Strips all space characters from the code array for the current line
+    // if there was a {{tag}} on it and otherwise only spaces.
+    var stripSpace = function () {
+      if (hasTag && !nonSpace && !options.space) {
+        while (spaces.length) {
+          code.splice(spaces.pop(), 1);
+        }
+      } else {
+        spaces = [];
+      }
+
+      hasTag = false;
+      nonSpace = false;
+    };
+
+    var sectionStack = [], updateLine, nextOpenTag, nextCloseTag;
+
+    var setTags = function (source) {
+      tags = trim(source).split(/\s+/);
+      nextOpenTag = tags[0];
+      nextCloseTag = tags[tags.length - 1];
+    };
+
+    var includePartial = function (source) {
+      code.push(
+        '";',
+        updateLine,
+        '\nvar partial = partials["' + trim(source) + '"];',
+        '\nif (partial) {',
+        '\n  buffer += render(partial,stack[stack.length - 1],partials);',
+        '\n}',
+        '\nbuffer += "'
+      );
+    };
+
+    var openSection = function (source, inverted) {
+      var name = trim(source);
+
+      if (name === "") {
+        throw debug(new Error("Section name may not be empty"), template, line, options.file);
+      }
+
+      sectionStack.push({name: name, inverted: inverted});
+
+      code.push(
+        '";',
+        updateLine,
+        '\nvar name = "' + name + '";',
+        '\nvar callback = (function () {',
+        '\n  return function () {',
+        '\n    var buffer = "";',
+        '\nbuffer += "'
+      );
+    };
+
+    var openInvertedSection = function (source) {
+      openSection(source, true);
+    };
+
+    var closeSection = function (source) {
+      var name = trim(source);
+      var openName = sectionStack.length != 0 && sectionStack[sectionStack.length - 1].name;
+
+      if (!openName || name != openName) {
+        throw debug(new Error('Section named "' + name + '" was never opened'), template, line, options.file);
+      }
+
+      var section = sectionStack.pop();
+
+      code.push(
+        '";',
+        '\n    return buffer;',
+        '\n  };',
+        '\n})();'
+      );
+
+      if (section.inverted) {
+        code.push("\nbuffer += renderSection(name,stack,callback,true);");
+      } else {
+        code.push("\nbuffer += renderSection(name,stack,callback);");
+      }
+
+      code.push('\nbuffer += "');
+    };
+
+    var sendPlain = function (source) {
+      code.push(
+        '";',
+        updateLine,
+        '\nbuffer += lookup("' + trim(source) + '",stack,"");',
+        '\nbuffer += "'
+      );
+    };
+
+    var sendEscaped = function (source) {
+      code.push(
+        '";',
+        updateLine,
+        '\nbuffer += escapeHTML(lookup("' + trim(source) + '",stack,""));',
+        '\nbuffer += "'
+      );
+    };
+
+    var line = 1, c, callback;
+    for (var i = 0, len = template.length; i < len; ++i) {
+      if (template.slice(i, i + openTag.length) === openTag) {
+        i += openTag.length;
+        c = template.substr(i, 1);
+        updateLine = '\nline = ' + line + ';';
+        nextOpenTag = openTag;
+        nextCloseTag = closeTag;
+        hasTag = true;
+
+        switch (c) {
+        case "!": // comment
+          i++;
+          callback = null;
+          break;
+        case "=": // change open/close tags, e.g. {{=<% %>=}}
+          i++;
+          closeTag = "=" + closeTag;
+          callback = setTags;
+          break;
+        case ">": // include partial
+          i++;
+          callback = includePartial;
+          break;
+        case "#": // start section
+          i++;
+          callback = openSection;
+          break;
+        case "^": // start inverted section
+          i++;
+          callback = openInvertedSection;
+          break;
+        case "/": // end section
+          i++;
+          callback = closeSection;
+          break;
+        case "{": // plain variable
+          closeTag = "}" + closeTag;
+          // fall through
+        case "&": // plain variable
+          i++;
+          nonSpace = true;
+          callback = sendPlain;
+          break;
+        default: // escaped variable
+          nonSpace = true;
+          callback = sendEscaped;
+        }
+
+        var end = template.indexOf(closeTag, i);
+
+        if (end === -1) {
+          throw debug(new Error('Tag "' + openTag + '" was not closed properly'), template, line, options.file);
+        }
+
+        var source = template.substring(i, end);
+
+        if (callback) {
+          callback(source);
+        }
+
+        // Maintain line count for \n in source.
+        var n = 0;
+        while (~(n = source.indexOf("\n", n))) {
+          line++;
+          n++;
+        }
+
+        i = end + closeTag.length - 1;
+        openTag = nextOpenTag;
+        closeTag = nextCloseTag;
+      } else {
+        c = template.substr(i, 1);
+
+        switch (c) {
+        case '"':
+        case "\\":
+          nonSpace = true;
+          code.push("\\" + c);
+          break;
+        case "\r":
+          // Ignore carriage returns.
+          break;
+        case "\n":
+          spaces.push(code.length);
+          code.push("\\n");
+          stripSpace(); // Check for whitespace on the current line.
+          line++;
+          break;
+        default:
+          if (isWhitespace(c)) {
+            spaces.push(code.length);
+          } else {
+            nonSpace = true;
+          }
+
+          code.push(c);
+        }
+      }
+    }
+
+    if (sectionStack.length != 0) {
+      throw debug(new Error('Section "' + sectionStack[sectionStack.length - 1].name + '" was not closed properly'), template, line, options.file);
+    }
+
+    // Clean up any whitespace from a closing {{tag}} that was at the end
+    // of the template without a trailing \n.
+    stripSpace();
+
+    code.push(
+      '";',
+      "\nreturn buffer;",
+      "\n} catch (e) { throw {error: e, line: line}; }"
+    );
+
+    // Ignore `buffer += "";` statements.
+    var body = code.join("").replace(/buffer \+= "";\n/g, "");
+
+    if (options.debug) {
+      if (typeof console != "undefined" && console.log) {
+        console.log(body);
+      } else if (typeof print === "function") {
+        print(body);
+      }
+    }
+
+    return body;
+  }
+
+  /**
+   * Used by `compile` to generate a reusable function for the given `template`.
+   */
+  function _compile(template, options) {
+    var args = "view,partials,stack,lookup,escapeHTML,renderSection,render";
+    var body = parse(template, options);
+    var fn = new Function(args, body);
+
+    // This anonymous function wraps the generated function so we can do
+    // argument coercion, setup some variables, and handle any errors
+    // encountered while executing it.
+    return function (view, partials) {
+      partials = partials || {};
+
+      var stack = [view]; // context stack
+
+      try {
+        return fn(view, partials, stack, lookup, escapeHTML, renderSection, render);
+      } catch (e) {
+        throw debug(e.error, template, e.line, options.file);
+      }
+    };
+  }
+
+  // Cache of pre-compiled templates.
+  var _cache = {};
+
+  /**
+   * Clear the cache of compiled templates.
+   */
+  function clearCache() {
+    _cache = {};
+  }
+
+  /**
+   * Compiles the given `template` into a reusable function using the given
+   * `options`. In addition to the options accepted by Mustache.parse,
+   * recognized options include the following:
+   *
+   *   - cache    Set `false` to bypass any pre-compiled version of the given
+   *              template. Otherwise, a given `template` string will be cached
+   *              the first time it is parsed
+   */
+  function compile(template, options) {
+    options = options || {};
+
+    // Use a pre-compiled version from the cache if we have one.
+    if (options.cache !== false) {
+      if (!_cache[template]) {
+        _cache[template] = _compile(template, options);
+      }
+
+      return _cache[template];
+    }
+
+    return _compile(template, options);
+  }
+
+  /**
+   * High-level function that renders the given `template` using the given
+   * `view` and `partials`. If you need to use any of the template options (see
+   * `compile` above), you must compile in a separate step, and then call that
+   * compiled function.
+   */
+  function render(template, view, partials) {
+    return compile(template)(view, partials);
+  }
+
+})(Mustache);
 /*!
   * Reqwest! A general purpose XHR connection manager
-  * copyright Dustin Diaz 2011
+  * (c) Dustin Diaz 2011
   * https://github.com/ded/reqwest
   * license MIT
   */
-!function(context,win){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):"")+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText;if(r)switch(type){case"json":resp=win.JSON?win.JSON.parse(r):eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=handleReadyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script"),e=0;win[getCallbackName(a)]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0,d.onload=d.onreadystatechange=function(){if(d[readyState]&&d[readyState]!=="complete"&&d[readyState]!=="loaded"||e)return!1;d.onload=d.onreadystatechange=null,a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d),e=1},head.appendChild(d)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.slice(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept=c.Accept||"text/javascript, text/html, application/xml, text/xml, */*",b.crossOrigin||(c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest"),c[contentType]=c[contentType]||"application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}function handleReadyState(a,b,c){return function(){a&&a[readyState]==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",readyState="readyState",contentType="Content-Type",head=doc[byTag]("head")[0],uniqid=0,lastValue,xhr="XMLHttpRequest"in win?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")};Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=[a[byTag]("input"),a[byTag]("select"),a[byTag]("textarea")],c=[],d,e;for(d=0,l=b.length;d<l;++d)for(e=0,l2=b[d].length;e<l2;++e)c.push(serial(b[d][e]));return c.join("").replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=context.reqwest;reqwest.noConflict=function(){context.reqwest=old;return this},typeof module!="undefined"?module.exports=reqwest:context.reqwest=reqwest}(this,window);wax = wax || {};
+!function(a,b){typeof module!="undefined"?module.exports=b():typeof define=="function"&&define.amd?define(a,b):this[a]=b()}("reqwest",function(){function handleReadyState(a,b,c){return function(){a&&a[readyState]==4&&(twoHundo.test(a.status)?b(a):c(a))}}function setHeaders(a,b){var c=b.headers||{},d;c.Accept=c.Accept||defaultHeaders.accept[b.type]||defaultHeaders.accept["*"],!b.crossOrigin&&!c[requestedWith]&&(c[requestedWith]=defaultHeaders.requestedWith),c[contentType]||(c[contentType]=b.contentType||defaultHeaders.contentType);for(d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d])}function generalCallback(a){lastValue=a}function urlappend(a,b){return a+(/\?/.test(a)?"&":"?")+b}function handleJsonp(a,b,c,d){var e=uniqid++,f=a.jsonpCallback||"callback",g=a.jsonpCallbackName||"reqwest_"+e,h=new RegExp("((^|\\?|&)"+f+")=([^&]+)"),i=d.match(h),j=doc.createElement("script"),k=0;i?i[3]==="?"?d=d.replace(h,"$1="+g):g=i[3]:d=urlappend(d,f+"="+g),win[g]=generalCallback,j.type="text/javascript",j.src=d,j.async=!0,typeof j.onreadystatechange!="undefined"&&(j.event="onclick",j.htmlFor=j.id="_reqwest_"+e),j.onload=j.onreadystatechange=function(){if(j[readyState]&&j[readyState]!=="complete"&&j[readyState]!=="loaded"||k)return!1;j.onload=j.onreadystatechange=null,j.onclick&&j.onclick(),a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(j),k=1},head.appendChild(j)}function getRequest(a,b,c){var d=(a.method||"GET").toUpperCase(),e=typeof a=="string"?a:a.url,f=a.processData!==!1&&a.data&&typeof a.data!="string"?reqwest.toQueryString(a.data):a.data||null,g;return(a.type=="jsonp"||d=="GET")&&f&&(e=urlappend(e,f),f=null),a.type=="jsonp"?handleJsonp(a,b,c,e):(g=xhr(),g.open(d,e,!0),setHeaders(g,a),g.onreadystatechange=handleReadyState(g,b,c),a.before&&a.before(g),g.send(f),g)}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function setType(a){var b=a.match(/\.(json|jsonp|html|xml)(\?|$)/);return b?b[1]:"js"}function init(o,fn){function complete(a){o.timeout&&clearTimeout(self.timeout),self.timeout=null,o.complete&&o.complete(a)}function success(resp){var r=resp.responseText;if(r)switch(type){case"json":try{resp=win.JSON?win.JSON.parse(r):eval("("+r+")")}catch(err){return error(resp,"Could not parse JSON in response",err)}break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function error(a,b,c){o.error&&o.error(a,b,c),complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort()},o.timeout)),this.request=getRequest(o,success,error)}function reqwest(a,b){return new Reqwest(a,b)}function normalize(a){return a?a.replace(/\r?\n/g,"\r\n"):""}function serial(a,b){var c=a.name,d=a.tagName.toLowerCase(),e=function(a){a&&!a.disabled&&b(c,normalize(a.attributes.value&&a.attributes.value.specified?a.value:a.text))};if(a.disabled||!c)return;switch(d){case"input":if(!/reset|button|image|file/i.test(a.type)){var f=/checkbox/i.test(a.type),g=/radio/i.test(a.type),h=a.value;(!f&&!g||a.checked)&&b(c,normalize(f&&h===""?"on":h))}break;case"textarea":b(c,normalize(a.value));break;case"select":if(a.type.toLowerCase()==="select-one")e(a.selectedIndex>=0?a.options[a.selectedIndex]:null);else for(var i=0;a.length&&i<a.length;i++)a.options[i].selected&&e(a.options[i])}}function eachFormElement(){var a=this,b,c,d,e=function(b,c){for(var e=0;e<c.length;e++){var f=b[byTag](c[e]);for(d=0;d<f.length;d++)serial(f[d],a)}};for(c=0;c<arguments.length;c++)b=arguments[c],/input|select|textarea/i.test(b.tagName)&&serial(b,a),e(b,["input","select","textarea"])}function serializeQueryString(){return reqwest.toQueryString(reqwest.serializeArray.apply(null,arguments))}function serializeHash(){var a={};return eachFormElement.apply(function(b,c){b in a?(a[b]&&!isArray(a[b])&&(a[b]=[a[b]]),a[b].push(c)):a[b]=c},arguments),a}var win=window,doc=document,twoHundo=/^20\d$/,byTag="getElementsByTagName",readyState="readyState",contentType="Content-Type",requestedWith="X-Requested-With",head=doc[byTag]("head")[0],uniqid=0,lastValue,xmlHttpRequest="XMLHttpRequest",isArray=typeof Array.isArray=="function"?Array.isArray:function(a){return a instanceof Array},defaultHeaders={contentType:"application/x-www-form-urlencoded",accept:{"*":"text/javascript, text/html, application/xml, text/xml, */*",xml:"application/xml, text/xml",html:"text/html",text:"text/plain",json:"application/json, text/javascript",js:"application/javascript, text/javascript"},requestedWith:xmlHttpRequest},xhr=win[xmlHttpRequest]?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")};return Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serializeArray=function(){var a=[];return eachFormElement.apply(function(b,c){a.push({name:b,value:c})},arguments),a},reqwest.serialize=function(){if(arguments.length===0)return"";var a,b,c=Array.prototype.slice.call(arguments,0);return a=c.pop(),a&&a.nodeType&&c.push(a)&&(a=null),a&&(a=a.type),a=="map"?b=serializeHash:a=="array"?b=reqwest.serializeArray:b=serializeQueryString,b.apply(null,c)},reqwest.toQueryString=function(a){var b="",c,d=encodeURIComponent,e=function(a,c){b+=d(a)+"="+d(c)+"&"};if(isArray(a))for(c=0;a&&c<a.length;c++)e(a[c].name,a[c].value);else for(var f in a){if(!Object.hasOwnProperty.call(a,f))continue;var g=a[f];if(isArray(g))for(c=0;c<g.length;c++)e(f,g[c]);else e(f,a[f])}return b.replace(/&$/,"").replace(/%20/g,"+")},reqwest.compat=function(a,b){return a&&(a.type&&(a.method=a.type)&&delete a.type,a.dataType&&(a.type=a.dataType),a.jsonpCallback&&(a.jsonpCallbackName=a.jsonpCallback)&&delete a.jsonpCallback,a.jsonp&&(a.jsonpCallback=a.jsonp)),new Reqwest(a,b)},reqwest});wax = wax || {};
 
 // Attribution
 // -----------
@@ -2191,7 +2343,7 @@ wax.hash = function(options) {
 
     function pushState(state) {
         var l = window.location;
-        l.replace(l.toString().replace(l.hash, '#' + state));
+        l.replace(l.toString().replace((l.hash || /$/), '#' + state));
     }
 
     var s0, // old hash
@@ -2314,7 +2466,7 @@ wax.interaction = function() {
                     parent: parent(),
                     data: feature,
                     formatter: gm.formatter().format,
-                    pos: pos,
+                    pos:pos,
                     e: e
                 });
             } else {
@@ -2338,6 +2490,7 @@ wax.interaction = function() {
         _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'click', onUp);
+            bean.add(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -2540,6 +2693,33 @@ wax.legend = function() {
     };
 
     return legend.add();
+};
+var wax = wax || {};
+
+wax.location = function() {
+
+    var t = {};
+
+    function on(o) {
+        console.log(o);
+        if ((o.e.type === 'mousemove' || !o.e.type)) {
+            return;
+        } else {
+            var loc = o.formatter({ format: 'location' }, o.data);
+            if (loc) {
+                window.location.href = loc;
+            }
+        }
+    }
+
+    t.events = function() {
+        return {
+            on: on
+        };
+    };
+
+    return t;
+
 };
 var wax = wax || {};
 wax.movetip = {};
@@ -2830,6 +3010,10 @@ wax.tooltip = function() {
 
             tooltips.push(tt);
 
+            bean.add(close, 'touchstart mousedown', function(e) {
+                e.stop();
+            });
+
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();
                 hide();
@@ -3074,6 +3258,39 @@ wax.leaf.interaction = function() {
           return map._container;
         })
         .grid(grid);
+};
+wax = wax || {};
+wax.leaf = wax.leaf || {};
+
+// Legend Control
+// --------------
+// The Leaflet version of this control is a very, very
+// light wrapper around the `/lib` code for legends.
+wax.leaf.legend = function(map, tilejson) {
+    tilejson = tilejson || {};
+    var l, // parent legend
+        legend = {};
+
+    legend.add = function() {
+        l = wax.legend()
+            .content(tilejson.legend || '');
+        return this;
+    };
+
+    legend.content = function(x) {
+        if (x) l.content(x.legend || '');
+    };
+
+    legend.element = function() {
+        return l.element();
+    };
+
+    legend.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(l.element());
+        return this;
+    };
+
+    return legend.add();
 };
 wax = wax || {};
 wax.leaf = wax.leaf || {};
