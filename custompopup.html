@@ -13,7 +13,7 @@
   <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
   <script type="text/javascript" src="js/wax.leaf.min-6.0.5-touched.js"></script>
   <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
-  <script type="text/javascript" src="dist/cartodb-popup-min.js"></script>
+  <script type="text/javascript" src="dist/cartodb-popup.js"></script>
 
   <script type="text/javascript">
 
@@ -52,6 +52,7 @@
           document.body.style.cursor = "default";
         },
         featureClick: function(ev,latlng,pos,data) {
+          ev.stopPropagation();
           // Set popup content
           popup.setContent(data);
 

@@ -142,6 +142,7 @@ L.CartoDBPopup = L.Class.extend({
     }
 
     var wrapper = this._wrapper = L.DomUtil.create('div', prefix + '-content-wrapper', container);
+    L.DomEvent.addListener(this._wrapper, 'click', L.DomEvent.stopPropagation);
     L.DomEvent.disableClickPropagation(wrapper);
 
     this._contentNode = L.DomUtil.create('div', prefix + '-content', wrapper);

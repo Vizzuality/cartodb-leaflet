@@ -1,0 +1,175 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!-- Consider adding a manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <title>CartoDB | Leaflet library</title>
+    <link href="http://developers.cartodb.com/stylesheets/all.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="css/style.css" media="screen" rel="stylesheet" type="text/css" />
+    <script src="http://developers.cartodb.com/javascripts/all.js" type="text/javascript"></script>    
+    <link rel="shortcut icon" href="http://developers.cartodb.com/images/favicon.ico" />
+    <script type="text/javascript">
+      var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-20934186-3']); _gaq.push(['_setDomainName', 'cartodb.com']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();
+    </script>
+    <noscript><meta http-equiv="refresh" content="0;url=http://cartodb.com/no_javascript.html"></noscript>
+  </head>
+  <body class="developers examples" onload="initialize()">
+    <div class="background blue grid fixed">
+      <header>
+        <h1 class="left">
+          <a href="http://cartodb.com">CartoDB</a>
+        </h1>
+        <nav class="right">
+          <a href="http://cartodb.com/tour">Tour</a>
+          <a href="http://cartodb.com/maps">Maps</a>
+          <a class="selected" href="http://developers.cartodb.com">Developers</a>
+          <a href="http://cartodb.com/pricing">Pricing</a>
+          <a href="http://cartodb.com/login">Sign in</a>
+        </nav>
+      </header>
+    </div>
+
+    <div class="background floating">
+      <section class="top black no_padding shadow">
+        <div class="content">
+          <h2 class="center big">Here are some examples using<br/>CartoDB Leaflet library</h2>
+          <form>
+            <input type="text" value="" data-label="What are you looking for?"/>
+            <input type="submit" class="button blue border" value="Search" />
+          </form>
+        </div>
+      </section>
+
+      <section class="shadow bottom">
+        <div class="content no_padding">
+          <ul class="examples_list">     
+            <li>
+              <h3><a href="custom-popup.html">CartoDB custom popup</a></h3>
+              <p class="light">A leaflet map using our genuine popup.</p>
+              <em class="basic">basic</em>
+            </li>
+          
+            <li>
+              <h3><a href="query-by-distance.html">Query by distance</a></h3>
+              <p class="light">Search features around a point within a specific radius.</p>
+              <em class="medium">medium</em>
+            </li>
+          
+            <li>
+              <h3><a href="search-column.html">Search by column</a></h3>
+              <p class="light">Search any feature in the table by a column.</p>
+              <em class="medium">medium</em>
+            </li>
+    
+            <li>
+              <h3><a href="hover-polygon.html">Hover interactivity with polygons</a></h3>
+              <p class="light">Use an interactivity polygon to highlight the feature.</p>
+              <em class="hard">hard</em>
+            </li>
+          
+            <li>
+              <h3><a href="hover-point.html">Hover interactivity with points</a></h3>
+              <p class="light">Use an interactivity point to highlight the feature.</p>
+              <em class="hard">hard</em>
+            </li>
+          
+            <li>
+              <h3><a href="hover-line.html">Hover interactivity with lines</a></h3>
+              <p class="light">Use an interactivity line to highlight the feature.</p>
+              <em class="hard">hard</em>
+            </li>
+
+          </ul>
+        </div>
+      </section>
+
+      <section class="grey carto shadow margin40">
+        <div class="content less_padding">
+          <div class="left">
+            <h2 class="compact dark">Further info? Take a look a the docs</h2>
+            <p class="light margin10">Visit our support area and get some help from the community.</p>
+          </div>
+          <div class="right">
+            <a class="button blue right margin5" href="http://developers.cartodb.com/documentation/using-cartodb.html">Go to documentation</a>
+          </div>
+        </div>
+      </section>
+  
+      <section class="white shadow leftwards margin40">
+        <div class="content overflow">
+          <h3>CartoDB Video Channel</h3>
+          <div class="left">
+            <iframe class="margin30" src="//player.vimeo.com/video/29030961?portrait=0" width="599" height="329" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+          </div>
+          <div class="right margin30">
+            <p class="light">Let’s get started with what is CartoDB and why we created it.<p>
+            <p class="light margin20">Andrew Hill and Simon Tokumine, both CartoDB developers explain why we are so excited about it.</p>
+            <p class="light margin20">The video was featured at FOSS4G in Denver, when CartoDB got presented to the OSS community.</p>
+            <p class="light margin20">If you want to watch more videos, interviews or even tutorials, take a look at our video channel</p>
+            <a href="http://vimeo.com/channels/cartodb" target="_blank" class="button blue border video margin20">Visit our video channel</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="background white border margin40">
+        <section>
+          <div class="content less_padding">
+            <div class="left">
+              <h3 class="lighter margin10">CartoDB is also used by</h3>
+            </div>
+            <div class="right">
+              <ul class="logos">
+                <li><a class="unep-wcmc" target="_blank" href="http://www.unep-wcmc.org/"><img alt="UNEP-WCMC" title="UNEP-WCMC" src="http://developers.cartodb.com/images/logos/unep-wcmc.png" /></a></li>
+                <li><a class="nasa" target="nasa" href="http://www.nasa.gov"><img alt="NASA" title="NASA" src="http://developers.cartodb.com/images/logos/nasa.png" /></a></li>
+                <li><a class="diversity" target="_blank" href="http://www.cbd.int/"><img alt="Convention on Biological Diversity" title="Convention on Biological Diversity" src="http://developers.cartodb.com/images/logos/diversity.png" /></a></li>
+                <li><a class="wsj" target="_blank" href="http://europe.wsj.com/home-page"><img alt="Wall Street Journal" title="Wall Street Journal" src="http://developers.cartodb.com/images/logos/wsj.png" /></a></li>
+                <li><a class="wri" target="_blank" href="http://www.wri.org/"><img alt="WORLD RESOURCES INSTITUTE" title="WORLD RESOURCES INSTITUTE" src="http://developers.cartodb.com/images/logos/wri.png" /></a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="background white border">
+        <section>
+          <div class="content no_padding">
+            <ul class="hz">
+              <li>
+                <h3>Common questions</h3>
+              </li>
+              <li>
+                <h3>Do you have any educational plans?</h3>
+                <p class="light margin15">Yes we have. <a href="mailto:support@cartodb.com">Contact us</a> for getting more information. We are quite friends of academics so, you will get a lot of benefits.</p>
+              </li>
+              <li>
+                <h3>Need something extra? Let us now.</h3>
+                <p class="light margin15">Need us to help you with your visualization or application? Does your organization have unique requirements that don’t quite fit our plans? <a href="mailto:support@cartodb.com">Contact us</a>.</p>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <footer>
+        <div class="wrap">
+          <span class="cartodb">CartoDB</span>
+          <p class="lighter small left">CartoDB is a product of <a class="vizzuality" href="http://vizzuality.com">Vizzuality</a>
+          </p>
+          <nav class="right">
+            <a href="http://cartodb.com/tour">Feature tour</a>
+            <a href="http://cartodb.com/tutorial/step/1">Getting started</a>
+            <a href="http://cartodb.com/maps">Maps</a>
+            <a href="http://developers.cartodb.com">Developers</a>
+            <a href="http://blog.cartodb.com">Blog</a>
+            <a href="http://cartodb.com/pricing">Pricing</a>
+            <a href="mailto:support@cartodb.com">Contact</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
