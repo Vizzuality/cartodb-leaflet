@@ -27,7 +27,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       tiler_protocol: "http",
       sql_domain:     "cartodb.com",
       sql_port:       "80",
-      sql_protocol:   "http"
+      sql_protocol:   "http",
+      extra_params: {},
+      cdn_url:null
     },
 
     /**
@@ -52,6 +54,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    sql_protocol      -     SQL API protocol (opcional - default = 'http')
      *    sql_domain        -     SQL API domain (opcional - default = 'cartodb.com')
      *    sql_port          -     SQL API port as a string (opcional - default = '80')
+     *    extra_params      -     In case you want to pass aditional params to cartodb tiler, pass them
+     *                            as an object     
+     *    cdn_url           -     If you want to use a CDN as a proxy set the URL   
      */
 
     initialize: function (options) {
@@ -360,6 +365,13 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
       // Add the cartodb tiles
       var cartodb_url = this.generateUrl("tiler") + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}.png?sql=' + query +'&style=' + tile_style;
+      
+      // extra_params? 
+      for (_param in this.options.extra_params) {
+         cartodb_url += "&"+_param+"="+this.options.extra_params[_param];
+      }
+
+      
       this.layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB', opacity: this.options.opacity});
 
       this.options.map.addLayer(this.layer,false);
@@ -442,6 +454,13 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         tile_url = this._addUrlData(tile_url, query);
         grid_url = this._addUrlData(grid_url, query);
       }
+      
+      // extra_params? 
+      for (_param in this.options.extra_params) {
+        tile_url = this._addUrlData(tile_url, _param+"="+this.options.extra_params[_param]);
+        grid_url = this._addUrlData(grid_url, _param+"="+this.options.extra_params[_param]);
+      }
+
 
       // STYLE?
       if (this.options.tile_style) {
@@ -527,6 +546,11 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @params {String} Options including tiler_protocol, user_name, tiler_domain and tiler_port
      */    
     generateUrl: function(type){
+      //First check if we are using a CDN which in that case we dont need to do all this.
+      if(this.options.cdn_url) {
+        return this.options.cdn_url;
+      }
+      
       if (type == "sql") {
          return this.options.sql_protocol + 
              "://" + ((this.options.user_name)?this.options.user_name+".":"")  + 
