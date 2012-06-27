@@ -18,10 +18,10 @@ html, body {
 }
 #legend {
   position:absolute;
-  bottom: 10px;
-  right: 10px;
-  width:200px;
-  padding:10px;
+  bottom: 0px;
+  right: 0px;
+  width:360px;
+  padding:0px;
   z-index:1000;
   background:white;
   border-color:grey!important;
