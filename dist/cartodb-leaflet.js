@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.48 [June 18, 2012]
+ * @version 0.49 [July 16, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -105,7 +105,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         } else { return }
       }
 
-      this.layer.setOpacity(opacity);
+      // Leaflet only accepts 0-0.99... Weird!
+      this.layer.setOpacity(opacity == 1 ? 0.99 : opacity);
     },
 
 

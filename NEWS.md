@@ -1,4 +1,8 @@
 
+[v 0.49]
+- Hide and show bug fixed.
+- Wax 7.0.0 touched and added.
+
 [v 0.48]
 - New function, setOptions, to change any param at the same time.
 - Wax 6.2.3 touched and added.
