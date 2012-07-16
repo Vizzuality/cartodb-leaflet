@@ -5,15 +5,15 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
   <title>CartoDB + Leaflet | Custom infowindow</title>
   <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
-  <style>body,html {width:100%; height:100%; margin:0; padding:0;} #map {position:relative; margin:200px 0 0 200px; width:500px; height:500px;}</style>
+  <style>body,html {width:100%; height:100%; margin:0; padding:0;} #map {position:relative; margin:0; width:100%; height:100%;}</style>
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-  <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+  <!--[if IE]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
   <link  href="../css/style.css" rel="stylesheet" type="text/css">
   <link  href="../css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-  <script type="text/javascript" src="../js/wax.leaf-7.0.0dev1.js"></script>
-  <script type="text/javascript" src="../dist/cartodb-leaflet.js"></script>
+  <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+  <script type="text/javascript" src="../js/wax.leaf.min-7.0.0dev1-touched.js"></script>
+  <script type="text/javascript" src="../dist/cartodb-leaflet-min.js"></script>
   <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script>
 
   <script type="text/javascript">
@@ -26,8 +26,29 @@
       // Create a CartoDB popup
       var popup = new L.CartoDBPopup();
 
+      // First cartodb layer, countries
+      var cartodb_leaflet1 = new L.CartoDBLayer({
+        map: map,
+        user_name:'examples',
+        table_name: 'country_colors',
+        query: "SELECT * FROM {{table_name}}",
+        opacity:0.5,
+        interactivity: "cartodb_id",
+        featureOver: function(ev,latlng,pos,data) {
+          document.body.style.cursor = "pointer";
+        },
+        featureOut: function() {
+          document.body.style.cursor = "default";
+        },
+        featureClick: function() {},
+        auto_bound: false,
+        debug: true
+      });
+      // Adding layer to map
+      map.addLayer(cartodb_leaflet1);
+
       // Now the CartoDB layer, the earthquakes
-      earthquakes = new L.CartoDBLayer({
+      var earthquakes = new L.CartoDBLayer({
         map: map,
         user_name:"examples",
         table_name: 'earthquakes',
@@ -42,7 +63,15 @@
           document.body.style.cursor = "default";
         },
         featureClick: function(ev,latlng,pos,data) {
-          ev.stopPropagation();
+
+          if (typeof( window.event ) != "undefined" ) {
+            // IE
+            ev.cancelBubble=true;
+          } else {
+            // Rest
+            ev.stopPropagation();
+          }
+          
           // Set popup content
           popup.setContent(data);
 
@@ -58,34 +87,6 @@
       // Adding layer to map
       map.addLayer(earthquakes);
 
-
-        // dataLayer = new L.CartoDBLayer({
-        // map: map,
-        // user_name:'',
-        // tiler_domain : 'd2f7e17k9sr9mq.cloudfront.net',
-        // table_name: 'st0627',
-        // query: "SELECT st0627.cartodb_id,st0627.the_geom_webmercator,state_demographics.usps as thecode,state_demographics.pres_status as status,state_demographics.name as thename,state_demographics.usps as usps FROM st0627, state_demographics WHERE state_demographics.usps = st0627.usps", 
-        // interactivity: "cartodb_id,thecode,thename,usps", 
-        // featureOver: function(ev, latlng, pos, data) {console.log(data.thename);},
-        // featureOut: function() {},
-        // featureClick: function(ev, latlng, pos, data) {
-        //   //openDetailBox(data,pos)
-        // },
-        // auto_bound: false
-        // });
-        // map.addLayer(dataLayer);
-        
-        // stBGLayer = new L.CartoDBLayer({
-        //       map: map,
-        //       user_name:'',
-        //       tiler_domain : 'd2f7e17k9sr9mq.cloudfront.net',
-        //       table_name: 'st0627',
-        //       //query: bgPresQ,
-        //         tile_style: "#st0627{polygon-fill:#FFFFFF;polygon-opacity:0;line-opacity:1;line-color:#444444;line-width:0.5;}",
-        //       opacity:1,
-        //       auto_bound: false
-        //  });
-        // map.addLayer(stBGLayer);
     }
   </script>
 </head>

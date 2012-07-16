@@ -190,10 +190,10 @@ First of all add the necessary script and css files:
 
 ```html
 <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-<!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+<!--[if IE]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
 <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
 <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-<script type="text/javascript" src="js/wax.leaf.min-6.2.3-touched.js"></script>
+<script type="text/javascript" src="js/wax.leaf.min-7.0.0dev1-touched.js"></script>
 <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
 <script type="text/javascript" src="dist/cartodb-popup.js"></script>
 ```
@@ -220,7 +220,9 @@ var cartodb_leaflet = new L.CartoDBLayer({
   query: "SELECT * FROM {{table_name}}",
   tile_style: "#{{table_name}}{marker-fill:red}",
   interactivity: "cartodb_id, magnitude",
-  featureClick: function(ev, latlng, pos, data) {alert(data)}
+  featureClick: function(ev, latlng, pos, data) {alert(data)},
+  featureOver: function(){},
+  featureOut: function(){},
   auto_bound: true
 });
 ```
