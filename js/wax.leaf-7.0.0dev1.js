@@ -1,4 +1,4 @@
-/* wax - 6.2.3 - 1.0.4-590-gcd05aa2 */
+/* wax - 7.0.0dev1 - v6.0.4-55-g5f73b7c */
 
 
 !function (name, context, definition) {
@@ -98,11 +98,10 @@
           , stopPropagation = 'stopPropagation'
           , createStopPropagation = function (event) {
               return function () {
-                if (event[stopPropagation]) {
+                if (event[stopPropagation])
                   event[stopPropagation]()
-                } else {
-                  if (typeof event.cancelBubble !== 'unknown') { event.cancelBubble = true; }
-                }
+                else
+                  event.cancelBubble = true
               }
             }
           , createStop = function (synEvent) {
@@ -2034,24 +2033,9 @@ wax.attribution = function() {
     var container,
         a = {};
 
-    function urlX(url) {
-        // Data URIs are subject to a bug in Firefox
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
-        // which let them be a vector. But WebKit does 'the right thing'
-        // or at least 'something' about this situation, so we'll tolerate
-        // them.
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     a.content = function(x) {
         if (typeof x === 'undefined') return container.innerHTML;
-        container.innerHTML = html_sanitize(x, urlX, idX);
+        container.innerHTML = wax.u.sanitize(x);
         return this;
     };
 
@@ -2061,7 +2045,7 @@ wax.attribution = function() {
 
     a.init = function() {
         container = document.createElement('div');
-        container.className = 'wax-attribution';
+        container.className = 'map-attribution';
         return this;
     };
 
@@ -2156,21 +2140,11 @@ wax.formatter = function(x) {
         f = function() {};
     }
 
-    function urlX(url) {
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     // Wrap the given formatter function in order to
     // catch exceptions that it may throw.
     formatter.format = function(options, data) {
         try {
-            return html_sanitize(f(options, data), urlX, idX);
+            return wax.u.sanitize(f(options, data));
         } catch (e) {
             if (console) console.log(e);
         }
@@ -2265,7 +2239,9 @@ wax.gm = function() {
         formatter;
 
     var gridUrl = function(url) {
-        return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
+        if (url) {
+            return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
+        }
     };
 
     function templatedGridUrl(template) {
@@ -2295,9 +2271,16 @@ wax.gm = function() {
     };
 
     manager.gridUrl = function(x) {
+        // Getter-setter
         if (!arguments.length) return gridUrl;
-        gridUrl = typeof x === 'function' ?
-            x : templatedGridUrl(x);
+
+        // Handle tilesets that don't support grids
+        if (!x) {
+            gridUrl = function() { return null; };
+        } else {
+            gridUrl = typeof x === 'function' ?
+                x : templatedGridUrl(x);
+        }
         return manager;
     };
 
@@ -2322,8 +2305,11 @@ wax.gm = function() {
             manager.template(x.template);
         } else if (x.formatter) {
             manager.formatter(x.formatter);
+        } else {
+            // In this case, we cannot support grids
+            formatter = undefined;
         }
-        if (x.grids) manager.gridUrl(x.grids);
+        manager.gridUrl(x.grids);
         if (x.resolution) resolution = x.resolution;
         tilejson = x;
         return manager;
@@ -2467,7 +2453,7 @@ wax.interaction = function() {
                     parent: parent(),
                     data: feature,
                     formatter: gm.formatter().format,
-                    pos:pos,
+                    pos: pos,
                     e: e
                 });
             } else {
@@ -2491,7 +2477,6 @@ wax.interaction = function() {
         _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'click', onUp);
-            bean.add(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -2652,43 +2637,28 @@ wax.legend = function() {
         legend = {},
         container;
 
-    function urlX(url) {
-        // Data URIs are subject to a bug in Firefox
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
-        // which let them be a vector. But WebKit does 'the right thing'
-        // or at least 'something' about this situation, so we'll tolerate
-        // them.
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     legend.element = function() {
         return container;
     };
 
     legend.content = function(content) {
         if (!arguments.length) return element.innerHTML;
-        if (content) {
-            element.innerHTML = html_sanitize(content, urlX, idX);
-            element.style.display = 'block';
-        } else {
-            element.innerHTML = '';
+
+        element.innerHTML = wax.u.sanitize(content);
+        element.style.display = 'block';
+        if (element.innerHTML === '') {
             element.style.display = 'none';
         }
+
         return legend;
     };
 
     legend.add = function() {
         container = document.createElement('div');
-        container.className = 'wax-legends';
+        container.className = 'map-legends';
 
         element = container.appendChild(document.createElement('div'));
-        element.className = 'wax-legend';
+        element.className = 'map-legend';
         element.style.display = 'none';
         return legend;
     };
@@ -2758,7 +2728,7 @@ wax.movetip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -2785,7 +2755,7 @@ wax.movetip = function() {
             if (!content) return;
             hide();
             var tt = document.body.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
@@ -2888,21 +2858,6 @@ wax.request = {
 wax.template = function(x) {
     var template = {};
 
-    function urlX(url) {
-        // Data URIs are subject to a bug in Firefox
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
-        // which let them be a vector. But WebKit does 'the right thing'
-        // or at least 'something' about this situation, so we'll tolerate
-        // them.
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     // Clone the data object such that the '__[format]__' key is only
     // set for this instance of templating.
     template.format = function(options, data) {
@@ -2913,7 +2868,7 @@ wax.template = function(x) {
         if (options.format) {
             clone['__' + options.format + '__'] = true;
         }
-        return html_sanitize(Mustache.to_html(x, clone), urlX, idX);
+        return wax.u.sanitize(Mustache.to_html(x, clone));
     };
 
     return template;
@@ -2952,12 +2907,11 @@ wax.tooltip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
 
-    
     function remove() {
         if (this.parentNode) this.parentNode.removeChild(this);
     }
@@ -2970,7 +2924,7 @@ wax.tooltip = function() {
                 // This code assumes that transform-supporting browsers
                 // also support proper events. IE9 does both.
                   bean.add(_ct, transitionEvent, remove);
-                  _ct.className += ' wax-fade';
+                  _ct.className += ' map-fade';
             } else {
                 if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
             }
@@ -3001,7 +2955,7 @@ wax.tooltip = function() {
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
@@ -3079,6 +3033,7 @@ wax.u = {
                 el.style.msTransform;
 
             if (style) {
+                var match;
                 if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
@@ -3165,15 +3120,11 @@ wax.u = {
             var htmlComputed = document.body.parentNode.currentStyle;
             var topMargin = parseInt(htmlComputed.marginTop, 10) || 0;
             var leftMargin = parseInt(htmlComputed.marginLeft, 10) || 0;
-            // return {
-            //     x: e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
-            //         (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
-            //     y: e.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
-            //         (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
-            // };
             return {
-              x: e.clientX,
-              y: e.clientY
+                x: e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+                    (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
+                y: e.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
+                    (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
             };
         } else if (e.touches && e.touches.length === 1) {
             // Touch browsers
@@ -3203,7 +3154,58 @@ wax.u = {
     // during a given window of time.
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
+    },
+
+    sanitize: function(content) {
+        if (!content) return '';
+
+        function urlX(url) {
+            // Data URIs are subject to a bug in Firefox
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
+            // which let them be a vector. But WebKit does 'the right thing'
+            // or at least 'something' about this situation, so we'll tolerate
+            // them.
+            if (/^(https?:\/\/|data:image)/.test(url)) {
+                return url;
+            }
+        }
+
+        function idX(id) { return id; }
+
+        return html_sanitize(content, urlX, idX);
     }
+};
+wax = wax || {};
+wax.leaf = wax.leaf || {};
+
+wax.leaf.hash = function(map) {
+    return wax.hash({
+        getCenterZoom: function () {
+            var center = map.getCenter(),
+                zoom = map.getZoom(),
+                precision = Math.max(
+                    0,
+                    Math.ceil(Math.log(zoom) / Math.LN2));
+
+            return [
+                zoom,
+                center.lat.toFixed(precision),
+                center.lng.toFixed(precision)
+            ].join('/');
+        },
+
+        setCenterZoom: function (args) {
+            map.setView(new L.LatLng(args[1], args[2]), args[0]);
+        },
+
+        bindChange: function (fn) {
+            map.on('moveend', fn);
+        },
+
+        unbindChange: function (fn) {
+            map.off('moveend', fn);
+        }
+    });
 };
 wax = wax || {};
 wax.leaf = wax.leaf || {};
@@ -3305,7 +3307,6 @@ wax.leaf.connector = L.TileLayer.extend({
         options = options || {};
         options.minZoom = options.minzoom || 0;
         options.maxZoom = options.maxzoom || 22;
-        options.opacity = options.opacity || 1;
         L.TileLayer.prototype.initialize.call(this, options.tiles[0], options);
     }
 });

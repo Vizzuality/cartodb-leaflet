@@ -1,0 +1,54 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow:hidden;
+}
+
+#map_canvas { top: 40px; }
+#loader {
+  width:200px;
+  padding:10px;
+  position:absolute;
+  top: 50px;
+  z-index:1000;
+  margin:auto;
+  margin-left:-100px;
+  left:50%;
+}
+#legend {
+  position:absolute;
+  bottom: 0px;
+  right: 0px;
+  width:360px;
+  padding:0px;
+  z-index:1000;
+  background:white;
+  border-color:grey!important;
+}
+
+.btn-group {
+  float:right;
+}
+
+.container {
+  display:block;
+  width:auto;
+  margin:0 10px;
+}
+
+#tooltip {
+  position:absolute;
+  right: 100px;
+  width:120px;
+  height:auto;
+  padding:10px;
+  z-index:1000;
+  display:none;
+  background:white;
+  border-color:#DDDDDD!important;
+  font:normal 12px Arial!important;
+  color:#666666!important;
+}
+
+#tooltip label {font-weight:bold;}
