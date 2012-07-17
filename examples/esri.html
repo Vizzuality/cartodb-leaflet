@@ -56,8 +56,9 @@
         auto_bound: false,
         debug: true
       });
+
       // Adding layer to map
-      map.addLayer(earthquakes);
+      map.addLayer(earthquakes,false);
 
       map.setView(new L.LatLng(36.204824, 138.252924), 6).addLayer(streetMapLayer,true);
     }
