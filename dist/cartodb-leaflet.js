@@ -1,4 +1,4 @@
-**
+/**
  * @name cartodb-leaflet
  * @version 0.49 [July 16, 2012]
  * @author: jmedina@vizzuality.com
