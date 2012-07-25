@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.49 [July 16, 2012]
+ * @version 0.50 [July 25, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -574,16 +574,17 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     _findPos: function (map,o) {
       var curleft = curtop = 0;
       var obj = map._container;
+
+
       if (obj.offsetParent) {
         // Modern browsers
         do {
           curleft += obj.offsetLeft;
           curtop += obj.offsetTop;
         } while (obj = obj.offsetParent);
-        return map.containerPointToLayerPoint(new L.Point(o.e.clientX - curleft,o.e.clientY - curtop))
+        return map.containerPointToLayerPoint(new L.Point((o.e.clientX || o.e.changedTouches[0].clientX) - curleft,(o.e.clientY || o.e.changedTouches[0].clientY) - curtop))
       } else {
         // IE
-        console.log(map.mouseEventToLayerPoint(o.e));
         return map.mouseEventToLayerPoint(o.e)
       }
     }
