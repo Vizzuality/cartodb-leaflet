@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.48 [June 18, 2012]
+ * @version 0.50 [July 25, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -9,7 +9,7 @@
  *                 
  */
  
- 
+
 if (typeof(L.CartoDBLayer) === "undefined") {
 
   L.CartoDBLayer = L.Class.extend({
@@ -75,7 +75,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         this.setBounds();
 
       // Add cartodb logo, yes sir!
-      this._addWadus(); 
+      this._addWadus();
     },
 
     /**
@@ -110,7 +110,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         } else { return }
       }
 
-      this.layer.setOpacity(opacity);
+      // Leaflet only accepts 0-0.99... Weird!
+      this.layer.setOpacity(opacity == 1 ? 0.99 : opacity);
     },
 
 
@@ -345,10 +346,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       if (!document.getElementById('cartodb_logo')) {
         var cartodb_link = document.createElement("a");
         cartodb_link.setAttribute('id','cartodb_logo');
-        cartodb_link.setAttribute('style',"position:absolute; bottom:8px; left:8px; display:block;");
+        cartodb_link.setAttribute('style',"position:absolute; bottom:8px; left:8px; display:block; z-index:10000;");
         cartodb_link.setAttribute('href','http://www.cartodb.com');
         cartodb_link.setAttribute('target','_blank');
-        cartodb_link.innerHTML = "<img src='http://cartodb.s3.amazonaws.com/static/new_logo.png' alt='CartoDB' title='CartoDB' />";
+        cartodb_link.innerHTML = "<img src='http://cartodb.s3.amazonaws.com/static/new_logo.png' style='border:none; outline:none' alt='CartoDB' title='CartoDB' />";
         this.options.map._container.appendChild(cartodb_link);
       }
     },
@@ -416,19 +417,19 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
       switch (o.e.type) {
         case 'mousemove': if (this.options.featureOver) {
-                            return this.options.featureOver(o.e,latlng,o.pos,o.data);
+                            return this.options.featureOver(o.e,latlng,{x: o.e.clientX, y: o.e.clientY},o.data);
                           } else {
                             if (this.options.debug) throw('featureOver function not defined');
                           }
                           break;
         case 'click':   if (this.options.featureClick) {
-                            this.options.featureClick(o.e,latlng,o.pos,o.data);
+                            this.options.featureClick(o.e,latlng,{x: o.e.clientX, y: o.e.clientY},o.data);
                           } else {
                             if (this.options.debug) throw('featureClick function not defined');
                           }
                           break;
         case 'touchend':  if (this.options.featureClick) {
-                            this.options.featureClick(o.e,latlng,o.pos,o.data);
+                            this.options.featureClick(o.e,latlng,{x: o.e.clientX, y: o.e.clientY},o.data);
                           } else {
                             if (this.options.debug) throw('featureClick function not defined');
                           }
@@ -573,13 +574,15 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     _findPos: function (map,o) {
       var curleft = curtop = 0;
       var obj = map._container;
+
+
       if (obj.offsetParent) {
         // Modern browsers
         do {
           curleft += obj.offsetLeft;
           curtop += obj.offsetTop;
         } while (obj = obj.offsetParent);
-        return map.containerPointToLayerPoint(new L.Point(o.pos.x - curleft,o.pos.y - curtop))
+        return map.containerPointToLayerPoint(new L.Point((o.e.clientX || o.e.changedTouches[0].clientX) - curleft,(o.e.clientY || o.e.changedTouches[0].clientY) - curtop))
       } else {
         // IE
         return map.mouseEventToLayerPoint(o.e)

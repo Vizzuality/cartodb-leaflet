@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>NY State liquor licenses</title>
+    <title>NY Restaurant Week</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -13,15 +13,15 @@
 
     <!-- Le styles -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/ny_licenses.css" rel="stylesheet">
+    <link href="css/ny_restaurants.css" rel="stylesheet">
 
 
     <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-    <!--[if IE]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
     <link  href="http://dl.dropbox.com/u/580074/ny_licenses/css/cartodb.css" rel="stylesheet" type="text/css">
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script type="text/javascript" src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-  <script type="text/javascript" src="../js/wax.leaf.min-7.0.0dev1-touched.js"></script>
+  <script type="text/javascript" src="../js/wax.leaf.min-6.2.3-touched.js"></script>
   <script type="text/javascript" src="../dist/cartodb-leaflet.js"></script>
   <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script>
 
@@ -29,29 +29,29 @@
   	var licenses, map;
 
 	  function initialize() {
-			map = new L.Map('map_canvas').setView(new L.LatLng(40.71785916529029,-73.86829376220703), 11);
+			map = new L.Map('map_canvas').setView(new L.LatLng(40.737112,-73.9754104), 12);
 
       var mapboxUrl = 'http://{s}.tiles.mapbox.com/v3/cartodb.map-1nh578vv/{z}/{x}/{y}.png',
           mapbox = new L.TileLayer(mapboxUrl, {maxZoom: 17,attribution:"Powered by Leaflet and Mapbox"});
       map.addLayer(mapbox,true);
             
 
-  		var query="SELECT *,ST_X(the_geom) as lng,ST_Y(the_geom) as lat FROM bodegas ORDER BY random()";
+  		var query="SELECT *,ST_X(the_geom) as lng,ST_Y(the_geom) as lat FROM restaurant_week ORDER BY random()";
   		
         
         var popup = new L.CartoDBPopup();
         var circleMarker = new L.CircleMarker(null);
-        var hover_style = {radius:3, color:"#333", weight:2, opacity:1, fillColor: "#FFCC00", fillOpacity:0, clickable:false};
+        var hover_style = {radius:4, color:"#333", weight:2, opacity:1, fillColor: "#FFCC00", fillOpacity:0, clickable:false};
         
         
       licenses = new L.CartoDBLayer({
         map: map,
         user_name:'viz2',
-        extra_params:{v:2},
+        extra_params:{v:4},
         cdn_url:'http://d2c5ry9dy1ewvi.cloudfront.net',
-        table_name: 'bodegas',
+        table_name: 'restaurant_week',
         query: query,
-        interactivity: "cartodb_id,dba,licensecat,licensetype,lng,lat",
+        interactivity: "cartodb_id,name,meal,cuisine,price,link,lng,lat",
         featureOver: function(ev,latlng,pos,data) {
           document.body.style.cursor = "pointer";
           showTooltip(data,pos)
@@ -75,7 +75,10 @@
           circleMarker.cartodb_id = null;
           map.removeLayer(circleMarker)
         },
-        featureClick: function(ev,latlng,pos,data) {},
+        featureClick: function(ev,latlng,pos,data) {
+            window.open(data["link"],"_blank");
+            
+        },
         auto_bound: false
       });
 
@@ -85,12 +88,14 @@
     function showTooltip(data,point) {
       var html = "";
       
-      var name = (data["dba"]!="")?data["dba"]:"Unknown";
-      html += "<label>Name</label><p>" + name +"</p";
+      html += "<label>" + data["name"] +"</label>";
       
       
-      html += "<br><label>Licenset Cat</label><p>" + getLicenseCategoryName(data["licensecat"]) +"</p";
-      html += "<br><label>License Type</label><p>" + data["licensetype"] +"</p";
+      html += "<br><label>Meal</label><p>" + data["meal"] +"</p>";
+      html += "<br><label>Cuisine</label><p>" + data["cuisine"] +"</p>";
+      html += "<br><label>Price</label><p>" + data["price"] +"</p>";
+      html += "<br><a href='" + data["link"] +"' target='_blank'>Click for more info</a>";
+
       
       $("#tooltip").html(html);
       $("#tooltip").css({left: (point.x + 15) + 'px', top: point.y - ($("#tooltip").height()) + 10 + 'px'})
@@ -137,7 +142,7 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <h1 class="brand" href="#">NY State liquor licenses</h1>
+          <h1 class="brand" href="#">NY Restaurant week</h1>
           <div class="btn-group">
             <button class="btn" onClick="changeLayer('All')">All</button>
             <button class="btn" onClick="changeLayer('On-Premise')">On-Premise</button>
@@ -155,7 +160,7 @@
     </div> <!-- /container -->
     
     <div class="alert alert-info" id="legend">
-      <img src="img/legend_licenses.png" />
+      <img src="img/legend_restaurants.png" />
     </div>
 
     <div class="alert alert-info" id="tooltip">

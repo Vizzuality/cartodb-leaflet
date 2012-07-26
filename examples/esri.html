@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-  <title>CartoDB + Leaflet | Show / Hide</title>
+  <title>CartoDB + ESRI</title>
   <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
   <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map {height:100%;}</style>
   <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
@@ -11,7 +11,7 @@
   <link  href="../css/style.css" rel="stylesheet" type="text/css">
   <link  href="../css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+  <script src="../js/leaflet-0.4.0.js"></script>
   <script type="text/javascript" src="../js/wax.leaf.min-7.0.0dev1-touched.js"></script>
   <script type="text/javascript" src="../dist/cartodb-leaflet-min.js"></script>
   <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script>
@@ -21,9 +21,9 @@
 
     function initialize() {
       var map = new L.Map('map').setView(new L.LatLng(36.204824, 138.252924), 4)
-        , mapboxUrl = 'http://{s}.tiles.mapbox.com/v3/cartodb.map-1nh578vv/{z}/{x}/{y}.png'
-        , mapbox = new L.TileLayer(mapboxUrl, {maxZoom: 18, attribution: "Powered by Leaflet and Mapbox"});
-      map.addLayer(mapbox,true);
+          //Add Esri Tile Cache...
+        , streetMapUrl = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+        , streetMapLayer = new L.TileLayer(streetMapUrl, { maxZoom: 19, attribution: 'Tiles: &copy; Esri' });
 
       // Create a CartoDB popup
       var popup = new L.CartoDBPopup();
@@ -56,25 +56,16 @@
         auto_bound: false,
         debug: true
       });
+
       // Adding layer to map
-      map.addLayer(earthquakes);
+      map.addLayer(earthquakes,false);
+
+      map.setView(new L.LatLng(36.204824, 138.252924), 6).addLayer(streetMapLayer,true);
     }
 
-
-    function onChange() {      
-      if ($('input[type="checkbox"]').attr("checked")) {
-        earthquakes.show()
-      } else {
-        earthquakes.hide()
-      }
-    }
   </script>
 </head>
 <body onload="initialize()">
   <div id="map"></div>
-  <form class="example">
-    <input type="checkbox" checked onchange="onChange()"/>
-    <label class="small">Toggle the layer</label>
-  </form>
 </body>
 </html>
