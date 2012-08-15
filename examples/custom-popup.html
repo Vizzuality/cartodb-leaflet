@@ -54,7 +54,7 @@
         table_name: 'earthquakes',
         query: "SELECT cartodb_id,the_geom_webmercator,the_geom,magnitude FROM {{table_name}}",
         tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
-        opacity:0.2,
+        opacity:1,
         interactivity: "cartodb_id, magnitude",
         featureOver: function(ev,latlng,pos,data) {
           document.body.style.cursor = "pointer";

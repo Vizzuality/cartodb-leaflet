@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.50 [July 25, 2012]
+ * @version 0.51 [August 15, 2012]
  * @author: jmedina@vizzuality.com
  * @fileoverview <b>Author:</b> jmedina@vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -193,9 +193,11 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       if (this.interaction) {
         if (bool) {
           var self = this;
-          this.interaction.on('on', function(o) {self._bindWaxEvents(self.options.map,o)});
+          this.interaction.on('on', function(o) {self._bindWaxOnEvents(self.options.map,o)});
+          this.interaction.on('off', function(o) {self._bindWaxOffEvents()});
         } else {
           this.interaction.off('on');
+          this.interaction.off('off');
         }
       }
     },
@@ -395,14 +397,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       this.interaction = wax.leaf.interaction()
         .map(this.options.map)
         .tilejson(this.tilejson)
-        .on('on',function(o) {self._bindWaxEvents(self.options.map,o)})
-        .on('off', function(){
-          if (self.options.featureOut) {
-            return self.options.featureOut && self.options.featureOut();
-          } else {
-            if (self.options.debug) throw('featureOut function not defined');
-          }
-        });
+        .on('on', function(o) {self._bindWaxOnEvents(self.options.map,o)})
+        .on('off', function(o) {self._bindWaxOffEvents()});
     },
 
 
@@ -411,7 +407,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @param {Object} Layer map object
      * @param {Event} Wax event
      */
-    _bindWaxEvents: function(map,o) {
+    _bindWaxOnEvents: function(map,o) {
       var layer_point = this._findPos(map,o)
         , latlng = map.layerPointToLatLng(layer_point);
 
@@ -435,6 +431,18 @@ if (typeof(L.CartoDBLayer) === "undefined") {
                           }
                           break;
         default:          break;
+      }
+    },
+
+
+    /**
+     * Bind off event for wax interaction
+     */
+    _bindWaxOffEvents: function(){
+      if (this.options.featureOut) {
+        return this.options.featureOut && this.options.featureOut();
+      } else {
+        if (this.options.debug) throw('featureOut function not defined');
       }
     },
 
