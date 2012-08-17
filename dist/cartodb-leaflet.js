@@ -14,7 +14,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
   L.CartoDBLayer = L.Class.extend({
 
-    version: "0.49",
+    version: "0.51",
 
     includes: L.Mixin.Events,
 
