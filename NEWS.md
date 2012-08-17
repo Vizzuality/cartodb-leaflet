@@ -1,3 +1,8 @@
+[v 0.51]
+- Bug related to unbind interaction fixed.
+
+[v 0.50]
+- Bug related to iPad clientX and clientY position fixed.
 
 [v 0.49]
 - Hide and show bug fixed.

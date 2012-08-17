@@ -189,10 +189,10 @@ Here's [live example](http://vizzuality.github.com/cartodb-leaflet/examples/cust
 First of all add the necessary script and css files:
 
 ```html
-<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-<!--[if IE]><link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+<!--[if IE]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
 <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
-<script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+<script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
 <script type="text/javascript" src="js/wax.leaf.min-7.0.0dev1-touched.js"></script>
 <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
 <script type="text/javascript" src="dist/cartodb-popup.js"></script>
