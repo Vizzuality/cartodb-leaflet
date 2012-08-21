@@ -1,3 +1,6 @@
+[v 0.52]
+- Bug related to removing wax interacion fixex.
+
 [v 0.51]
 - Bug related to unbind interaction fixed.
 
