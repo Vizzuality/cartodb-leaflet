@@ -1,8 +1,9 @@
 [v 0.53]
-- New examples page.
-- Attribution paramater added + function to set it as well.
+- Examples index page back.
+- Attribution paramater + function added.
 - Wax (v7.0.0dev9) library updated.
 - Leaflet (v0.4.4) library updated.
+- Removed noscript redirects.
 
 [v 0.52]
 - Bug related to removing wax interacion fixex.

@@ -2,118 +2,96 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>WSJ election map</title>
+    <title>CartoDB | WSJ election map</title>
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <!-- Le styles -->
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/ny_licenses.css" rel="stylesheet">
+    <style>body,html {width:100%; height:100%; margin:0; padding:0; overflow:hidden;} #map_canvas {position:absolute; top:40px; left:0; right:0; bottom:0;}</style>
+    <link rel="stylesheet" href="../css/leaflet.css" />
+    <!--[if IE]><link rel="stylesheet" href="../css/leaflet.ie.css" /><![endif]-->
+    <link  href="../css/style.css" rel="stylesheet" type="text/css">
+    <link  href="../css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script src="../js/leaflet.js"></script>
+    <script type="text/javascript" src="../js/wax.leaf.min.js"></script>
+    <script type="text/javascript" src="../dist/cartodb-leaflet-min.js"></script>
+    <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script> 
 
+    <script type="text/javascript">
+    	var licenses, map;
 
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-    <!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
-    <link  href="http://dl.dropbox.com/u/580074/ny_licenses/css/cartodb.css" rel="stylesheet" type="text/css">
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-  <script type="text/javascript" src="../js/wax.leaf.min-6.2.3-touched.js"></script>
-  <script type="text/javascript" src="../dist/cartodb-leaflet.js"></script>
-  <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script>
+  	  function initialize() {
+  			map = new L.Map('map_canvas').setView(new L.LatLng( 26.58852714730864,-34.98046875), 4);
+                
 
-  <script type="text/javascript">
-  	var licenses, map;
-
-	  function initialize() {
-			map = new L.Map('map_canvas').setView(new L.LatLng( 26.58852714730864,-34.98046875), 4);
-              
-
-  		var query="SELECT st0627.cartodb_id,st0627.the_geom_webmercator,ST_ASGEOJSON(ST_SIMPLIFY(st0627.the_geom,0.1)) as geometry,state_demographics.pres_status as status,st0627.usps as thecode,st0627.refname as thename,state_demographics.usps as usps FROM st0627, state_demographics WHERE state_demographics.usps = st0627.usps";
-  		
-  		var style = "#st0627{line-color:#cccccc;line-width:0.7;line-opacity:1;}[status='none']{line-color:#999999;polygon-fill:#eeeeee}[status='Safe GOP']{polygon-fill:#c72535}[status='Likely GOP']{polygon-fill:#c72535}[status='Leans GOP']{polygon-fill:#d77464}[status='Leans Dem']{polygon-fill:#5c94ba}[status='Likely Dem']{polygon-fill:#0073a2}[status='Safe Dem']{polygon-fill:#0073a2}[status='Independent']{line-color:#cccccc;polygon-fill:#FFEEC3}[status='Toss Up']{line-color:#000000;polygon-fill:#cccccc;polygon-pattern-file:url('/home/ubuntu/tile_assets/wsjgraphics/hatchGR.png')}";
-        
-        var popup = new L.CartoDBPopup();
-        var polygon = new L.GeoJSON(null);
-        // Hover polygon style
-        var polygon_style = {color: "#FFCC00", weight: 3, opacity:1, fillOpacity: 0, fillColor:"#FFCC00", clickable:false};
-        
-        
-      licenses = new L.CartoDBLayer({
-        map: map,
-        user_name:'wsjgraphics',
-        table_name: 'st0627',
-        query: query,
-        tile_style: style,
-        interactivity: "cartodb_id,status,thename,geometry",
-        
-        featureOver: function(ev,latlng,pos,data) {
-          document.body.style.cursor = "pointer";
-          showTooltip(data,pos);
+    		var query="SELECT st0627.cartodb_id,st0627.the_geom_webmercator,ST_ASGEOJSON(ST_SIMPLIFY(st0627.the_geom,0.1)) as geometry,state_demographics.pres_status as status,st0627.usps as thecode,st0627.refname as thename,state_demographics.usps as usps FROM st0627, state_demographics WHERE state_demographics.usps = st0627.usps";
+    		
+    		var style = "#st0627{line-color:#cccccc;line-width:0.7;line-opacity:1;}[status='none']{line-color:#999999;polygon-fill:#eeeeee}[status='Safe GOP']{polygon-fill:#c72535}[status='Likely GOP']{polygon-fill:#c72535}[status='Leans GOP']{polygon-fill:#d77464}[status='Leans Dem']{polygon-fill:#5c94ba}[status='Likely Dem']{polygon-fill:#0073a2}[status='Safe Dem']{polygon-fill:#0073a2}[status='Independent']{line-color:#cccccc;polygon-fill:#FFEEC3}[status='Toss Up']{line-color:#000000;polygon-fill:#cccccc;polygon-pattern-file:url('/home/ubuntu/tile_assets/wsjgraphics/hatchGR.png')}";
+          
+          var popup = new L.CartoDBPopup();
+          var polygon = new L.GeoJSON(null);
+          // Hover polygon style
+          var polygon_style = {color: "#FFCC00", weight: 3, opacity:1, fillOpacity: 0, fillColor:"#FFCC00", clickable:false};
           
           
-          // Show the hover polygon if it is a different feature
-          if (data.cartodb_id != polygon.cartodb_id) {
-            map.removeLayer(polygon);
-            polygon.off("featureparse");
+        licenses = new L.CartoDBLayer({
+          map: map,
+          user_name:'wsjgraphics',
+          table_name: 'st0627',
+          query: query,
+          tile_style: style,
+          interactivity: "cartodb_id,status,thename,geometry",
           
-            polygon = new L.GeoJSON(null);
-            polygon.cartodb_id = data.cartodb_id;
+          featureOver: function(ev,latlng,pos,data) {
+            document.body.style.cursor = "pointer";
+            showTooltip(data,pos);
             
-            // Change style
-            polygon.on("featureparse", function (e) {
-              e.layer.setStyle(polygon_style);
-            });
-
-            polygon.addGeoJSON(JSON.parse(data.geometry));
-            map.addLayer(polygon);
+            // Show the hover polygon if it is a different feature
+            if (data.cartodb_id != polygon.cartodb_id) {
+              map.removeLayer(polygon);
+            
+              polygon = new L.GeoJSON(JSON.parse(data.geometry), {
+                style: function (feature) {
+                  return polygon_style;
+                }
+              }).addTo(map);
+              polygon.cartodb_id = data.cartodb_id;
+            }
+          },
+          featureOut: function() {
+            document.body.style.cursor = "default";
+            hideTooltip();
+            
+            // Hide and remove in any case the hover polygon
+            polygon.cartodb_id = null;
+            polygon.off("featureparse");
+            map.removeLayer(polygon)
+            
           }
-          
-          
-        },
-        featureOut: function() {
-          document.body.style.cursor = "default";
-          hideTooltip();
-          
-          // Hide and remove in any case the hover polygon
-          polygon.cartodb_id = null;
-          polygon.off("featureparse");
-          map.removeLayer(polygon)
-          
-        }
-        
-        
         });
 
-      map.addLayer(licenses)
-	  }
+        map.addLayer(licenses)
+  	  }
 
-    function showTooltip(data,point) {
-      var html = "";
-      
-      html += "<label>" + data["thename"] +" - "+ data["status"] + "</label>";
-      
-      $("#tooltip").html(html);
-      $("#tooltip").css({left: (point.x + 15) + 'px', top: point.y - ($("#tooltip").height()) + 10 + 'px'})
-      $("#tooltip").show();
-    }
+      function showTooltip(data,point) {
+        var html = "";
+        
+        html += "<label>" + data["thename"] +" - "+ data["status"] + "</label>";
+        
+        $("#tooltip").html(html);
+        $("#tooltip").css({left: (point.x + 15) + 'px', top: point.y - ($("#tooltip").height()) + 10 + 'px'})
+        $("#tooltip").show();
+      }
 
-    function hideTooltip() {
-      $("#tooltip").hide();
-    }
-    
-    
-	  
-  </script>
-
-</head>
-<body onload="initialize()">
-  
-  <div id="map_canvas"></div>
-
+      function hideTooltip() {
+        $("#tooltip").hide();
+      }
+    </script>
+  </head>
+  <body onload="initialize()">
+    <div id="map_canvas"></div>
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -121,24 +99,12 @@
         </div>
       </div>
     </div>
-
-
-    <div class="container">
-    </div> <!-- /container -->
-
-
     <div class="alert alert-info" id="tooltip">
       <p>Tooltip</p>
     </div>    
-
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bootstrap-tab.js"></script>
     <script src="js/bootstrap-tooltip.js"></script>
-</body>
+  </body>
 </html>
 

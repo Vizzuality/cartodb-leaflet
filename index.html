@@ -2,7 +2,6 @@
 <!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!-- Consider adding a manifest.appcache: h5bp.com/d/Offline -->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
   <head>
     <meta charset="utf-8">
@@ -15,7 +14,6 @@
     <script type="text/javascript">
       var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-20934186-3']); _gaq.push(['_setDomainName', 'cartodb.com']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();
     </script>
-    <noscript><meta http-equiv="refresh" content="0;url=http://cartodb.com/no_javascript.html"></noscript>
   </head>
   <body class="developers examples" onload="initialize()">
     <div class="background blue grid fixed">
@@ -36,29 +34,23 @@
     <div class="background floating">
       <section class="shadow top">
         <div class="content">
-          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.48</em></hgroup>
+          <hgroup><h2 class="dark">CartoDB Leaflet library</h2><em class="medium">0.53</em></hgroup>
         </div>
         <div class="content no_padding border code">
 
-          <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-          <!--[if IE]> <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /> <![endif]-->
+          <link rel="stylesheet" href="css/leaflet.css" />
+          <!--[if IE]> <link rel="stylesheet" href="css/leaflet.ie.css" /> <![endif]-->
           <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
-          <script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-          <script type="text/javascript" src="js/wax.leaf.min-7.0.0dev1-touched.js"></script>
+          <script type="text/javascript" src="js/leaflet.js"></script>
+          <script type="text/javascript" src="js/wax.leaf.min.js"></script>
           <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
 
           <script type="text/javascript">
             function initialize() {
-              var map = new L.Map('map').setView(new L.LatLng(20,0), 3);
-
-              var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-              cloudmadeAttrib = 'Map data &copy; 2012 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
-              cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
-              map.addLayer(cloudmade,true);
-
-
-              // Create leaflet standard popup
-              var popup = new L.Popup();
+                // Create the map
+              var map = new L.Map('map').setView([20,0], 3)
+                // Create leaflet standard popup
+                , popup = new L.Popup();
 
 
               // First cartodb layer, countries
@@ -123,7 +115,7 @@
             <h3 class="big">Overview</h3>
             <p class="light margin15">Use your CartoDB tables with a Leaflet map.</p>
             <p class="light margin15"><a href="http://leaflet.cloudmade.com/" target="_blank">Leaflet</a> is a modern, lightweight open-source JavaScript library for mobile-friendly interactive maps. It is developed by <a href="http://cloudmade.com/" target="_blank">CloudMade</a>. It still has all the features most developers ever need for online maps, while providing a fast, pleasant user experience.</p>
-            <p class="light margin15">The code is available on <a href="https://github.com/vizzuality/cartodb-leaflet" target="_blank">Github</a>. If you have any question there is a complete <a href="#documentation">documentation</a> or you can ask in the <a target="_blank" href="https://groups.google.com/forum/#!forum/cartodb">CartoDB mailing list</a>.</p>
+            <p class="light margin15">The code is available on <a href="https://github.com/vizzuality/cartodb-leaflet" target="_blank">Github</a>. We encourage you to download the source files and not pointing them from GitHub. If you have any question there is a complete <a href="#documentation">documentation</a> or you can ask in the <a target="_blank" href="https://groups.google.com/forum/#!forum/cartodb">CartoDB mailing list</a>.</p>
           </div>
           <div class="right">
             <a class="button blue download" href="https://github.com/Vizzuality/cartodb-leaflet/zipball/gh-pages">Download this library</a>
@@ -299,29 +291,25 @@
 
           <p class="margin15 light">First of all add the necessary script and css files:</p>
 
-          <pre class="margin10" data-language="html">
-&#60;link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" /&#62;
-&#60;!--[if IE]&#62; &#60;link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /&#62; &#60;![endif]--&#62;
+          <pre class="margin10 prettyprint" data-language="html">
+&#60;link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.css" /&#62;
+&#60;!--[if IE]&#62; &#60;link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.ie.css" /&#62; &#60;![endif]--&#62;
 &#60;link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css"&#62;
-&#60;script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"&#62;&#60;/script&#62;
-&#60;script type="text/javascript" src="js/wax.leaf.min-7.0.0dev1-touched.js"&#62;&#60;/script&#62;
-&#60;script type="text/javascript" src="dist/cartodb-leaflet-min.js"&#62;&#60;/script&#62;
+&#60;script src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.js"&#62;&#60;/script&#62;
+&#60;script type="text/javascript" src="https://raw.github.com/mapbox/wax/master/dist/wax.leaf.min.js"&#62;&#60;/script&#62;
+&#60;script type="text/javascript" src="https://raw.github.com/vizzuality/cartodb-leaflet/master/dist/cartodb-leaflet-min.js"&#62;&#60;/script&#62;
           </pre>
 
 
           <p class="margin15 light">When the document is loaded, start creating the map:</p>
 
-          <pre data-language="javascript">
+          <pre class="prettyprint" data-language="javascript">
 var map = new L.Map('map');
-var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-  cloudmadeAttrib = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-  cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttrib});
-map.addLayer(cloudmade);
           </pre>
             
           <p class="margin20 light">Then create the CartoDB layer:</p>
 
-          <pre class="margin10" data-language="javascript">
+          <pre class="margin10 prettyprint" data-language="javascript">
 var cartodb_leaflet = new L.CartoDBLayer({
   map: map,
   user_name:'example',
@@ -337,7 +325,7 @@ var cartodb_leaflet = new L.CartoDBLayer({
           </pre>
 
           <p class="margin20 light">And finally add it to the map:</p>
-          <pre data-language="javascript">map.addLayer(cartodb_leaflet);</pre>
+          <pre class="prettyprint" data-language="javascript">map.addLayer(cartodb_leaflet);</pre>
 
           <h5 class="margin30">Functions</h5>
           <p class="margin15 light">New funcionalities are coming, in the meantime you can use:</p>
@@ -345,66 +333,66 @@ var cartodb_leaflet = new L.CartoDBLayer({
           <ul class="margin20">
             <li style="display:block">
               <p class="light"><b>removeLayer</b>: Removes the cartodb layer from the map.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   map.removeLayer(cartodb_leaflet);</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   map.removeLayer(cartodb_leaflet);</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>hide</b>: Hide the cartodb layer from the map.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.hide();</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.hide();</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>show</b>: Show again the cartodb layer in the map.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.show();</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.show();</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setInteraction</b>: Set the interaction of your layer to true or false.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setInteraction(false);</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setInteraction(false);</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setOpacity</b>: Change the opacity of the CartoDB layer.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setOpacity(0.3);</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setOpacity(0.3);</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setQuery</b>: Change the query parameter for the layer.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setQuery("SELECT * FROM {{table_name}} WHERE cartodb_id > 10");</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setQuery("SELECT * FROM {{table_name}} WHERE cartodb_id > 10");</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setStyle</b>: Change the style of the layer tiles.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>isVisible</b>: Get the visibility of the layer.</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.isVisible();</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.isVisible();</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setInteractivity</b>: Change the columns you want to get data (it needs to reload the tiles).</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");</pre>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");</pre>
             </li>
             <li class="margin15" style="display:block">
-              <p class="light"><b>setBounds</b>: Set bounds in the map using a new query or the default one</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setBounds(); || cartodb_leaflet.setBounds("SELECT * FROM {{table_name}} WHERE cartodb_id < 100"); </pre>
+              <p class="light"><b>setBounds</b>: Set bounds in the map using a new query or the default one.</p>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setBounds(); || cartodb_leaflet.setBounds("SELECT * FROM {{table_name}} WHERE cartodb_id < 100"); </pre>
             </li>
             <li class="margin15" style="display:block">
-              <p class="light"><b>setOptions</b>:  Change any parameter at the same time refreshing the tiles once</p>
-              <pre style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setOptions({query: "SELECT * FROM {{table_name}} WHERE cartodb_id<100", interactivity: "cartodb_id,the_geom,magnitude"});</pre>
+              <p class="light"><b>setOptions</b>:  Change any parameter at the same time refreshing the tiles once.</p>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setOptions({query: "SELECT * FROM {{table_name}} WHERE cartodb_id<100", interactivity: "cartodb_id,the_geom,magnitude"});</pre>
             </li>
-            <li class="margin15" style="display:block">
+            <!--li class="margin15" style="display:block">
               <p class="light"><b>setLayerOrder</b>:  _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505</p>
-            </li>
+            </li-->
           </ul>
 
           <h5 class="margin30" id="custom-popup">Custom popup</h5>
           <p class="margin15 light">If you want to use the cartodb custom popup, you need to add the script in the html:</p>
-          <pre class="margin10" data-language="html">
+          <pre class="margin10 prettyprint" data-language="html">
 &#60;script type="text/javascript" src="dist/cartodb-popup-min.js"&#62;&#60;/script&#62;
           </pre>
 
           <p class="light margin15">Create the CartoDB popup:</p>
-          <pre data-language="javascript">
+          <pre margin="prettyprint" data-language="javascript">
 var popup = new L.CartoDBPopup();
           </pre>
 
           <p class="light margin15">And then use as you want:</p>
-          <pre data-language="javascript">
+          <pre class="prettyprint" data-language="javascript">
 ...
 featureClick: function(ev,latlng,pos,data) {
   // Set popup content
@@ -494,5 +482,9 @@ featureClick: function(ev,latlng,pos,data) {
         </div>
       </footer>
     </div>
+
+    <script>
+      prettyPrint();
+    </script>
   </body>
 </html>
