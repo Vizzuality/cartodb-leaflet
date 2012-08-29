@@ -1,3 +1,9 @@
+[v 0.51]
+- New examples page.
+- Attribution paramater added + function to set it as well.
+- Wax (v7.0.0dev9) library updated.
+- Leaflet (v0.4.4) library updated.
+
 [v 0.50]
 - Bug related to iPad clientX and clientY position fixed.
 
