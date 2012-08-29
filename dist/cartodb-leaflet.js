@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.52 [August 22, 2012]
+ * @version 0.53 [August 29, 2012]
  * @author: Vizzuality.com
  * @fileoverview <b>Author:</b> Vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -22,6 +22,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       query:          "SELECT * FROM {{table_name}}",
       opacity:        0.99,
       auto_bound:     false,
+      attribution:    "CartoDB",
       debug:          false,
       visible:        true,
       tiler_domain:   "cartodb.com",
@@ -47,6 +48,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      *    featureOver       -     Callback when user hovers a feature (return mouse event, latlng, position (x & y) and feature data)
      *    featureOut        -     Callback when user hovers out a feature
      *    featureClick      -     Callback when user clicks a feature (return mouse/touch event, latlng, position (x & y) and feature data)
+     *    attribution       -     Set the attribution text
      *    debug             -     Get error messages from the library
      *    auto_bound        -     Let cartodb auto-bound-zoom in the map (opcional - default = false)
      *
@@ -203,6 +205,37 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         }
       }
     },
+
+
+    /**
+     * Set a new layer attribution
+     * @params {String} New attribution string
+     */
+    setAttribution: function(attribution) {
+      if (!isNaN(attribution)) {
+        if (this.options.debug) {
+          throw(attribution + ' is not a valid attribution');
+        } else { return }
+      }
+
+      // Remove old one
+      this.options.map.attributionControl.removeAttribution(this.options.attribution);
+
+      // Set new attribution in the options
+      this.options.attribution = attribution;
+
+      // Change text
+      this.options.map.attributionControl.addAttribution(this.options.attribution);
+
+      // Change in the layer
+      if (!this.options.interactivity) {
+        this.layer.options.attribution = this.options.attribution;
+      } else {
+        this.layer.options.attribution = this.options.attribution;
+        this.tilejson.attribution = this.options.attribution;
+      }
+    },
+
 
 
     /**
@@ -394,11 +427,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       }
 
 
-      this.layer = new L.TileLayer(cartodb_url,{attribution:'CartoDB', opacity: this.options.opacity});
+      this.layer = new L.TileLayer(cartodb_url,{attribution: this.options.attribution, opacity: this.options.opacity});
 
       this.options.map.addLayer(this.layer,false);
     },
-
 
     /**
      * Add interaction cartodb tiles to the map
@@ -509,6 +541,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         blankImage: '../img/blank_tile.png',
         tilejson: '1.0.0',
         scheme: 'xyz',
+        attribution: this.options.attribution,
         tiles: [tile_url],
         grids: [grid_url],
         tiles_base: tile_url,

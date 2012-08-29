@@ -100,6 +100,14 @@ Using the library is really easy. It accepts the following parameters to manage 
 </tr>
 
 <tr>
+<td>attribution</td>
+<td>Set the layer attribution.</td>
+<td>String</td>
+<td></td>
+<td>No</td>
+</tr>
+
+<tr>
 <td>tile_style</td>
 <td>If you want to add other style to the layer.</td>
 <td>String</td>
@@ -189,11 +197,11 @@ Here's [live example](http://vizzuality.github.com/cartodb-leaflet/examples/cust
 First of all add the necessary script and css files:
 
 ```html
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-<!--[if IE]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /><![endif]-->
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.css" />
+<!--[if IE]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.ie.css" /><![endif]-->
 <link  href="css/cartodb-leaflet.css" rel="stylesheet" type="text/css">
-<script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-<script type="text/javascript" src="js/wax.leaf.min-7.0.0dev1-touched.js"></script>
+<script src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.js"></script>
+<script type="text/javascript" src="js/wax.leaf.min.js"></script>
 <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
 <script type="text/javascript" src="dist/cartodb-popup.js"></script>
 ```
@@ -223,6 +231,7 @@ var cartodb_leaflet = new L.CartoDBLayer({
   featureClick: function(ev, latlng, pos, data) {alert(data)},
   featureOver: function(){},
   featureOut: function(){},
+  attribution: "CartoDB",
   auto_bound: true
 });
 ```
@@ -246,6 +255,8 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.show();```
 - **setInteraction**: Set the interaction of your layer to true or false.
     Example: ```cartodb_leaflet.setInteraction(false);```
+- **setAttribution**: Set the layer attribution.
+    Example: ```cartodb_leaflet.setAttribution("CartoDB");```
 - **setOpacity**: Change the opacity of the CartoDB layer.
     Example: ```cartodb_leaflet.setOpacity(0.3);```
 - **setQuery**: Change the query parameter for the layer

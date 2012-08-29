@@ -10,7 +10,7 @@
     <link href="http://developers.cartodb.com/stylesheets/all.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="css/style.css" media="screen" rel="stylesheet" type="text/css" />
     <script src="http://developers.cartodb.com/javascripts/all.js" type="text/javascript"></script>    
-    <link rel="shortcut icon" href="http://developers.cartodb.com/images/favicon.ico" />
+    <link rel="shortcut icon" href="img/favicon.ico" />
     <script type="text/javascript">
       var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-20934186-3']); _gaq.push(['_setDomainName', 'cartodb.com']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();
     </script>
@@ -216,6 +216,13 @@
               <td>No (But only will work with <i>interactivity</i> specified)</td>
             </tr>
             <tr>
+              <td><i>attribution</i></td>
+              <td>Set the layer attribution.</td>
+              <td>String</td>
+              <td></td>
+              <td>No</td>
+            </tr>
+            <tr>
               <td><i>tile_style</i></td>
               <td>If you want to add other style to the layer.</td>
               <td>String</td>
@@ -346,6 +353,10 @@ var cartodb_leaflet = new L.CartoDBLayer({
             <li class="margin15" style="display:block">
               <p class="light"><b>setInteraction</b>: Set the interaction of your layer to true or false.</p>
               <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setInteraction(false);</pre>
+            </li>
+            <li class="margin15" style="display:block">
+              <p class="light"><b>setAttribution</b>: Set the layer attribution.</p>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setAttribution("CartoDB");</pre>
             </li>
             <li class="margin15" style="display:block">
               <p class="light"><b>setOpacity</b>: Change the opacity of the CartoDB layer.</p>
