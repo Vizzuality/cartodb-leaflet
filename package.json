@@ -1,0 +1,23 @@
+{
+    "name": "cartdo-leaflet",
+    "version": "0.51.0",
+    "description": "CartoDB Leaftlet connector",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Vizzuality/cartodb-leaflet.git"
+    },
+    "author": {
+        "name": "Vizzuality",
+        "url": "http://vizzuality.com/",
+        "email": "wadus@vizzuality.com"
+    },
+    "contributors": [
+        "Javier Alvarez <jamedina@vizzuality.com>"
+    ],
+    "licenses": [{
+      "type": "BSD"
+    }],
+    "devDependencies": {
+      "uglify-js": "1.0.x"
+    }
+}

@@ -1,8 +1,14 @@
-[v 0.51]
+[v 0.53]
 - New examples page.
 - Attribution paramater added + function to set it as well.
 - Wax (v7.0.0dev9) library updated.
 - Leaflet (v0.4.4) library updated.
+
+[v 0.52]
+- Bug related to removing wax interacion fixex.
+
+[v 0.51]
+- Bug related to unbind interaction fixed.
 
 [v 0.50]
 - Bug related to iPad clientX and clientY position fixed.
