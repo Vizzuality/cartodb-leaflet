@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.53 [August 29, 2012]
+ * @version 0.54 [September 2, 2012]
  * @author: Vizzuality.com
  * @fileoverview <b>Author:</b> Vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -14,7 +14,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
   L.CartoDBLayer = L.Class.extend({
 
-    version: "0.52",
+    version: "0.54",
 
     includes: L.Mixin.Events,
 
@@ -31,8 +31,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       sql_domain:     "cartodb.com",
       sql_port:       "80",
       sql_protocol:   "http",
-      extra_params: {},
-      cdn_url:null
+      extra_params:   {},
+      cdn_url:        null
     },
 
     /**
@@ -82,16 +82,14 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       this._addWadus();
     },
 
+
     /**
      * When Leaflet adds the layer... go!
      * @params {map}
      */
     onAdd: function(map) {
-      if (!this.options.interactivity) {
-        this._addSimple();
-      } else {
-        this._addInteraction();
-      }
+      this._addLayer();
+      this.fire('added');
     },
 
 
@@ -115,7 +113,13 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       }
 
       // Leaflet only accepts 0-0.99... Weird!
-      this.layer.setOpacity(opacity == 1 ? 0.99 : opacity);
+      this.options.opacity = opacity;
+
+      if (this.options.visible) {
+        this.layer.setOpacity(opacity == 1 ? 0.99 : opacity);  
+      }
+      
+      this.fire('updated');
     },
 
 
@@ -237,7 +241,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     },
 
 
-
     /**
      * Change multiple options at the same time
      * @params {Object} New options object
@@ -273,6 +276,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       this.setOpacity(0);
       this.setInteraction(false);
       this.options.visible = false;
+      this.fire('hidden');
     },
 
 
@@ -283,6 +287,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       this.setOpacity(this.options.opacity);
       this.setInteraction(true);
       this.options.visible = true;
+      this.fire('showed');
     },
 
 
@@ -291,6 +296,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * PRIVATE METHODS
      */
 
+
     /**
      * Remove CartoDB layer
      */
@@ -298,11 +304,19 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       // Unbind interaction
       this.setInteraction(false);
 
+      // Remove bind loading and load events
+      this.layer
+        .off("loading")
+        .off("load")
+
       // Remove interacion
-      this.interaction.remove();
+      if (this.interaction)
+        this.interaction.remove();
 
       // Remove layer
       this.options.map.removeLayer(this.layer);
+
+      this.fire('removed');
     },
 
 
@@ -314,11 +328,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       this._remove();
 
       // Create the new updated one
-      if (!this.options.interactivity) {
-        this._addSimple();
-      } else {
-        this._addInteraction();
-      }
+      this._addLayer();
+
+      this.fire('updated');
     },
 
 
@@ -396,60 +408,33 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     /**
-     * Add simple cartodb tiles to the map
-     */
-    _addSimple: function () {
-
-      // Add the cartodb tiles
-      var cartodb_url = this.generateUrl("tiler") + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}.png?'
-
-      // set params
-      var params = {};
-      if(this.options.query) {
-        params.sql = this.options.query;
-      }
-      if(this.options.style) {
-        params.style = this.options.style;
-      }
-      var url_params = [];
-      for(var k in params) {
-        var q = encodeURIComponent(
-          params[k].replace(/\{\{table_name\}\}/g, this.options.table_name)
-        );
-        url_params.push(k + "=" + q);
-      }
-      cartodb_url += url_params.join('&');
-
-
-      // extra_params?
-      for (_param in this.options.extra_params) {
-         cartodb_url += "&"+_param+"="+this.options.extra_params[_param];
-      }
-
-
-      this.layer = new L.TileLayer(cartodb_url,{attribution: this.options.attribution, opacity: this.options.opacity});
-
-      this.options.map.addLayer(this.layer,false);
-    },
-
-    /**
      * Add interaction cartodb tiles to the map
      */
-    _addInteraction: function () {
+    _addLayer: function () {
 
       var self = this;
 
-      // interaction placeholder
+      // generate the tilejson
       this.tilejson = this._generateTileJson();
-      this.layer = new wax.leaf.connector(this.tilejson);
+      this.layer = new wax.leaf.connector(
+          this.tilejson
+        ).on("loading", function() {
+          self.fire("loading", this);
+        }).on("load", function() {
+          self.fire("load", this);
+        });
 
+      // add the layer to the map
       this.options.map.addLayer(this.layer,false);
 
-      this.interaction = wax.leaf.interaction()
-        .map(this.options.map)
-        .tilejson(this.tilejson)
-        .on('on', function(o) {self._bindWaxOnEvents(self.options.map,o)})
-        .on('off', function(o) {self._bindWaxOffEvents()});
+      // add the interaction?
+      if (this.options.interactivity) {
+        this.interaction = wax.leaf.interaction()
+          .map(this.options.map)
+          .tilejson(this.tilejson)
+          .on('on', function(o) {self._bindWaxOnEvents(self.options.map,o)})
+          .on('off', function(o) {self._bindWaxOffEvents()});
+      }
     },
 
 
@@ -554,9 +539,11 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     },
 
 
+
     /*
      * HELPER FUNCTIONS
      */
+
 
     /**
      * Parse URI
@@ -627,7 +614,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     /**
-     * Get the google maps Point of the event
+     * Get the Leaflet Point of the event
      * @params {Object} Map object
      * @params {Object} Wax event object
      */

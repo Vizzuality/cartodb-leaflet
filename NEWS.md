@@ -1,3 +1,10 @@
+[v 0.54]
+- Added tests.
+- Opacity bug fixed.
+- Now there are triggers when an action is performed.
+- New 'loading' and 'load' events are triggered when layer is loading or done.
+- Simple and interaction layers are both based on wax.
+
 [v 0.53]
 - Examples index page back.
 - Attribution paramater + function added.
