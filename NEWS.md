@@ -1,9 +1,12 @@
 [v 0.54]
-- Added tests.
-- Opacity bug fixed.
+- First tests added.
+- Opacity bugs fixed.
 - Now there are triggers when an action is performed.
 - New 'loading' and 'load' events are triggered when layer is loading or done.
 - Simple and interaction layers are both based on wax.
+- All functins check first if the layer belongs to the map first.
+- New function isAdded returns if the layer belongs to the map.
+- Hide and show check if the layer is already shown or hidden.
 
 [v 0.53]
 - Examples index page back.
