@@ -416,6 +416,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         var q = encodeURIComponent(
           params[k].replace(/\{\{table_name\}\}/g, this.options.table_name)
         );
+        //left template variables the same
+        q = q.replace(/%7Bx%7D/g,"{x}").replace(/%7By%7D/g,"{y}").replace(/%7Bz%7D/g,"{z}");
         url_params.push(k + "=" + q);
       }
       cartodb_url += url_params.join('&');
@@ -510,7 +512,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
       // SQL?
       if (this.options.query) {
-        var query = 'sql=' + encodeURIComponent(this.options.query.replace(/\{\{table_name\}\}/g,this.options.table_name));
+        var q = encodeURIComponent(this.options.query.replace(/\{\{table_name\}\}/g,this.options.table_name));
+        q = q.replace(/%7Bx%7D/g,"{x}").replace(/%7By%7D/g,"{y}").replace(/%7Bz%7D/g,"{z}");
+        var query = 'sql=' +  q
         tile_url = this._addUrlData(tile_url, query);
         grid_url = this._addUrlData(grid_url, query);
       }
