@@ -25,10 +25,17 @@ describe('Show funcionality', function() {
 
 
   it('If layer is visible, show shouldn\'t do anything', function() {
-    cdb_layer.setOpacity(1);
+
+    cdb_layer.setOptions({ debug: false });
+
     cdb_layer.show();
+
     var $layer = $(div).find(".leaflet-layer")
       , opacity = cdb_layer.options.opacity;
+
+    expect(cdb_layer.show).toThrow();
+
+    cdb_layer.setOptions({ debug: true });
 
     expect(cdb_layer.options.visible).toBeTruthy();
     expect($layer.css("opacity")).toEqual(opacity.toString());

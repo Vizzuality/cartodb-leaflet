@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.54 [September 2, 2012]
+ * @version 0.54 [September 3, 2012]
  * @author: Vizzuality.com
  * @fileoverview <b>Author:</b> Vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -127,9 +127,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
       if (this.options.visible) {
         this.layer.setOpacity(opacity == 1 ? 0.99 : opacity);
+        this.fire('updated');
       }
-      
-      this.fire('updated');
     },
 
 
@@ -433,7 +432,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       }
 
       reqwest({
-        url: this._generateUrl("sql") + '/api/v2/sql/?q='+escape('SELECT ST_XMin(ST_Extent(the_geom)) as minx,ST_YMin(ST_Extent(the_geom)) as miny,'+
+        url: this._generateCoreUrl("sql") + '/api/v2/sql/?q='+escape('SELECT ST_XMin(ST_Extent(the_geom)) as minx,ST_YMin(ST_Extent(the_geom)) as miny,'+
           'ST_XMax(ST_Extent(the_geom)) as maxx,ST_YMax(ST_Extent(the_geom)) as maxy from ('+ query.replace(/\{\{table_name\}\}/g,this.options.table_name) + ') as subq'),
         type: 'jsonp',
         jsonpCallback: 'callback',
@@ -574,37 +573,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
      * @return {Object} Options for L.TileLayer
      */
     _generateTileJson: function () {
-      var core_url = this._generateUrl("tiler")
-        , base_url = core_url + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}'
-        , tile_url = base_url + '.png'
-        , grid_url = base_url + '.grid.json';
 
-      // SQL?
-      if (this.options.query) {
-        var query = 'sql=' + encodeURIComponent(this.options.query.replace(/\{\{table_name\}\}/g,this.options.table_name));
-        tile_url = this._addUrlData(tile_url, query);
-        grid_url = this._addUrlData(grid_url, query);
-      }
-
-      // EXTRA PARAMS?
-      for (_param in this.options.extra_params) {
-        tile_url = this._addUrlData(tile_url, _param+"="+this.options.extra_params[_param]);
-        grid_url = this._addUrlData(grid_url, _param+"="+this.options.extra_params[_param]);
-      }
-
-      // STYLE?
-      if (this.options.tile_style) {
-        var style = 'style=' + encodeURIComponent(this.options.tile_style.replace(/\{\{table_name\}\}/g,this.options.table_name));
-        tile_url = this._addUrlData(tile_url, style);
-        grid_url = this._addUrlData(grid_url, style);
-      }
-
-      // INTERACTIVITY?
-      if (this.options.interactivity) {
-        var interactivity = 'interactivity=' + encodeURIComponent(this.options.interactivity.replace(/ /g,''));
-        tile_url = this._addUrlData(tile_url, interactivity);
-        grid_url = this._addUrlData(grid_url, interactivity);
-      }
+      var urls = this._generateTileUrls();
 
       // Build up the tileJSON
       return {
@@ -612,10 +582,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         tilejson: '1.0.0',
         scheme: 'xyz',
         attribution: this.options.attribution,
-        tiles: [tile_url],
-        grids: [grid_url],
-        tiles_base: tile_url,
-        grids_base: grid_url,
+        tiles: [urls.tile_url],
+        grids: [urls.grid_url],
+        tiles_base: urls.tile_url,
+        grids_base: urls.grid_url,
         opacity: this.options.opacity,
         formatter: function(options, data) {
           return data
@@ -675,10 +645,10 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     /**
-     * Generate a URL for the tiler
+     * Generate the core URL for the tiler
      * @params {String} Options including tiler_protocol, user_name, tiler_domain and tiler_port
      */
-    _generateUrl: function(type){
+    _generateCoreUrl: function(type){
       //First check if we are using a CDN which in that case we dont need to do all this.
       if (this.options.cdn_url) {
         return this.options.cdn_url;
@@ -696,6 +666,52 @@ if (typeof(L.CartoDBLayer) === "undefined") {
              ((this.options.tiler_port != "") ? (":" + this.options.tiler_port) : "");
        }
     },
+
+
+    /**
+     * Generate the final tile and grid URLs for the tiler
+     */
+    _generateTileUrls: function() {
+      var core_url = this._generateCoreUrl("tiler")
+        , base_url = core_url + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}'
+        , tile_url = base_url + '.png'
+        , grid_url = base_url + '.grid.json';
+
+      // SQL?
+      if (this.options.query) {
+        var query = 'sql=' + encodeURIComponent(this.options.query.replace(/\{\{table_name\}\}/g,this.options.table_name));
+        tile_url = this._addUrlData(tile_url, query);
+        grid_url = this._addUrlData(grid_url, query);
+      }
+
+      // EXTRA PARAMS?
+      for (_param in this.options.extra_params) {
+        tile_url = this._addUrlData(tile_url, _param+"="+this.options.extra_params[_param]);
+        grid_url = this._addUrlData(grid_url, _param+"="+this.options.extra_params[_param]);
+      }
+
+      // STYLE?
+      if (this.options.tile_style) {
+        var style = 'style=' + encodeURIComponent(this.options.tile_style.replace(/\{\{table_name\}\}/g,this.options.table_name));
+        tile_url = this._addUrlData(tile_url, style);
+        grid_url = this._addUrlData(grid_url, style);
+      }
+
+      // INTERACTIVITY?
+      if (this.options.interactivity) {
+        var interactivity = 'interactivity=' + encodeURIComponent(this.options.interactivity.replace(/ /g,''));
+        tile_url = this._addUrlData(tile_url, interactivity);
+        grid_url = this._addUrlData(grid_url, interactivity);
+      }
+
+      return {
+        core_url: core_url,
+        base_url: base_url,
+        tile_url: tile_url,
+        grid_url: grid_url
+      }
+    },
+
 
 
     /**
@@ -723,76 +739,47 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     _checkTiles: function() {
-      var xyz = {
-          z: 4,
-          x: 6,
-          y: 6
-        }
-        , self = this;
+      var xyz = {z: 4, x: 6, y: 6}
+        , self = this
+        , img = new Image()
+        , urls = this._generateTileUrls();
 
 
-      var core_url = this._generateUrl("tiler")
-        , base_url = ( core_url + '/tiles/' + this.options.table_name + '/{z}/{x}/{y}' ).replace(/\{z\}/,xyz.z).replace(/\{x\}/,xyz.x).replace(/\{y\}/,xyz.y)
-        , tile_url = base_url + '.png'
-        , grid_url = base_url + '.grid.json';
+      img.src = urls.tile_url;
 
-      // SQL?
-      if (this.options.query) {
-        var query = 'sql=' + encodeURIComponent(this.options.query.replace(/\{\{table_name\}\}/g,this.options.table_name));
-        tile_url = this._addUrlData(tile_url, query);
-        grid_url = this._addUrlData(grid_url, query);
-      }
-
-      // extra_params?
-      for (_param in this.options.extra_params) {
-        tile_url = this._addUrlData(tile_url, _param+"="+this.options.extra_params[_param]);
-        grid_url = this._addUrlData(grid_url, _param+"="+this.options.extra_params[_param]);
-      }
-
-      // STYLE?
-      if (this.options.tile_style) {
-        var style = 'style=' + encodeURIComponent(this.options.tile_style.replace(/\{\{table_name\}\}/g,this.options.table_name));
-        tile_url = this._addUrlData(tile_url, style);
-        grid_url = this._addUrlData(grid_url, style);
-      }
-
-      // INTERACTIVITY?
-      if (this.options.interactivity) {
-        var interactivity = 'interactivity=' + encodeURIComponent(this.options.interactivity.replace(/ /g,''));
-        tile_url = this._addUrlData(tile_url, interactivity);
-        grid_url = this._addUrlData(grid_url, interactivity);
-      }
-
-      var img = new Image();
-      img.src = tile_url;
       img.onload = function() {
         delete img;
       }
       img.onerror = function() {
 
+        self.fire("layererror");
+
         // Remove interaction to prevent more request grid fails
-        if (self.interaction)
+        if (self.interaction) {
           self.interaction.remove();
 
-        reqwest({
-          method: "get",
-          url: grid_url,
-          type: 'jsonp',
-          jsonpCallback: 'callback',
-          jsonpCallbackName: 'grid',
-          success: function(result) {
-            console.log(result);
-            delete img;
-          },
-          error: function(error) {
-            console.log(error);
-            delete img;
-          },
-          complete: function (resp) {
-            console.log(resp);
-            delete img;
-          }
-        });
+          // reqwest({
+          //   method: "get",
+          //   url: grid_url,
+          //   type: 'jsonp',
+          //   jsonpCallback: 'callback',
+          //   jsonpCallbackName: 'grid',
+          //   success: function(result) {
+          //     console.log(result);
+          //     delete img;
+          //   },
+          //   error: function(error) {
+          //     console.log(error);
+          //     delete img;
+          //   },
+          //   complete: function (resp) {
+          //     console.log(resp);
+          //     delete img;
+          //   }
+          // });
+        }
+
+        delete img;   
       }
     }
 

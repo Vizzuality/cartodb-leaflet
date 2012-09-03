@@ -36,37 +36,38 @@ describe('Interaction funcionality', function() {
     expect(cdb_layer._bindWaxOffEvents).toThrow();
   });
 
-  it('If there is interaction defined, should work', function() {
 
-    runs(function () {
-      cdb_layer = new L.CartoDBLayer({
-        map: map,
-        user_name:"examples",
-        table_name: 'country_colors',
-        attribution: "Vizzuality",
-        interactivity: "cartodb_id",
-        featureOver:  function(ev,latlng,pos,data) {},
-        featureOut:   function() {},
-        featureClick: function(ev,latlng,pos,data) {},
-        opacity:0.8,
-        auto_bound: false,
-        debug: true
-      });
+  // it('If there is interaction defined, should work', function() {
 
-      map.addLayer(cdb_layer);
+  //   runs(function () {
+  //     cdb_layer = new L.CartoDBLayer({
+  //       map: map,
+  //       user_name:"examples",
+  //       table_name: 'country_colors',
+  //       attribution: "Vizzuality",
+  //       interactivity: "cartodb_id",
+  //       featureOver:  function(ev,latlng,pos,data) {},
+  //       featureOut:   function() {},
+  //       featureClick: function(ev,latlng,pos,data) {},
+  //       opacity:0.8,
+  //       auto_bound: false,
+  //       debug: true
+  //     });
 
-      $(div).trigger("mouseover", [50,50]);
-      $(div).trigger("mouseover", [25,25]);
-    });
+  //     map.addLayer(cdb_layer);
 
-    waits(2000);
+  //     $(div).trigger("mouseover", [50,50]);
+  //     $(div).trigger("mouseover", [25,25]);
+  //   });
 
-    runs(function () {
-      spyOn(cdb_layer, '_bindWaxOnEvents');
-      // Fake a click
-      $(div).find(".leaflet-container").trigger("click", [50,50]);
-      expect(cdb_layer._bindWaxOnEvents).toHaveBeenCalled();
-    });
-  });
+  //   waits(2000);
+
+  //   runs(function () {
+  //     spyOn(cdb_layer, '_bindWaxOnEvents');
+  //     // Fake a click
+  //     $(div).find(".leaflet-container").trigger("click", [50,50]);
+  //     expect(cdb_layer._bindWaxOnEvents).toHaveBeenCalled();
+  //   });
+  // });
 
 });

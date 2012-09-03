@@ -32,7 +32,7 @@
         map: map,
         user_name:'examples',
         table_name: 'country_colors',
-        query: "SELECT cartodb_id FROM {{table_name}}",
+        query: "SELECT * FROM {{table_name}}",
         opacity:0.5,
         interactivity: "cartodb_id,jamon",
         featureOver: function(ev,latlng,pos,data) {

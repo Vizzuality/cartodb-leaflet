@@ -265,6 +265,8 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");```
 - **isVisible**: Get the visibility of the layer
     Example: ```cartodb_leaflet.isVisible();```
+- **isAdded**: Returns if the layer is already added to the map
+    Example: ```cartodb_leaflet.isAdded();```    
 - **setInteractivity**: Change the columns you want to get data (it needs to reload the tiles)
     Example: ```cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");```
 - **setBounds**: Set bounds in the map using a new query or the default one
