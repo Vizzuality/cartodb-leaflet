@@ -742,7 +742,11 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       var xyz = {z: 4, x: 6, y: 6}
         , self = this
         , img = new Image()
-        , urls = this._generateTileUrls();
+        , urls = this._generateTileUrls()
+
+      // Choose a x-y-z for the check tile - grid
+      urls.tile_url = urls.tile_url.replace(/\{z\}/g,xyz.z).replace(/\{x\}/g,xyz.x).replace(/\{y\}/g,xyz.y);
+      urls.grid_url = urls.grid_url.replace(/\{z\}/g,xyz.z).replace(/\{x\}/g,xyz.x).replace(/\{y\}/g,xyz.y);
 
 
       img.src = urls.tile_url;

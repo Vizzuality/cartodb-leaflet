@@ -7,17 +7,11 @@ describe('Interaction funcionality', function() {
     div.style.width = "100px";
 
     map = L.map( div, {center: [51.505, -0.09],zoom: 13} );
-  });
-
-
-  it('If there is no interaction defined, shouldn\'t work and failed', function() {
 
     cdb_layer = new L.CartoDBLayer({
       map: map,
       user_name:"examples",
       table_name: 'country_colors',
-      query: "SELECT * FROM {{table_name}}",
-      tile_style: "#{{table_name}}{marker-fill:#E25B5B}",
       attribution: "Vizzuality",
       interactivity: "cartodb_id",
       opacity:0.8,
@@ -26,7 +20,10 @@ describe('Interaction funcionality', function() {
     });
 
     map.addLayer(cdb_layer);
+  });
 
+
+  it('If there is no interaction defined, shouldn\'t work and failed', function() {
     // Fake a mouseover
     $(div).trigger('mouseover');
     expect(cdb_layer._bindWaxOnEvents).toThrow();
@@ -37,37 +34,57 @@ describe('Interaction funcionality', function() {
   });
 
 
-  // it('If there is interaction defined, should work', function() {
+  it('If there is interaction defined, should work', function() {
 
-  //   runs(function () {
-  //     cdb_layer = new L.CartoDBLayer({
-  //       map: map,
-  //       user_name:"examples",
-  //       table_name: 'country_colors',
-  //       attribution: "Vizzuality",
-  //       interactivity: "cartodb_id",
-  //       featureOver:  function(ev,latlng,pos,data) {},
-  //       featureOut:   function() {},
-  //       featureClick: function(ev,latlng,pos,data) {},
-  //       opacity:0.8,
-  //       auto_bound: false,
-  //       debug: true
-  //     });
+    runs(function () {
+      cdb_layer.setOptions({
+        featureOver:  function(ev,latlng,pos,data) {},
+        featureOut:   function() {},
+        featureClick: function(ev,latlng,pos,data) {}
+      });      
 
-  //     map.addLayer(cdb_layer);
+      spyOn(cdb_layer, '_bindWaxOnEvents');
 
-  //     $(div).trigger("mouseover", [50,50]);
-  //     $(div).trigger("mouseover", [25,25]);
-  //   });
+      var e = new jQuery.Event("click");
+      e.pageX = 10;
+      e.pageY = 10;
+      $(div).trigger(e);
 
-  //   waits(2000);
+      cdb_layer.interaction.click(e,{x:100,y:100});
+    });
 
-  //   runs(function () {
-  //     spyOn(cdb_layer, '_bindWaxOnEvents');
-  //     // Fake a click
-  //     $(div).find(".leaflet-container").trigger("click", [50,50]);
-  //     expect(cdb_layer._bindWaxOnEvents).toHaveBeenCalled();
-  //   });
-  // });
+    waits(250);
+
+    runs(function () {
+      expect(cdb_layer._bindWaxOnEvents).toHaveBeenCalled();
+    });
+  });
+
+
+  it('If there is interaction defined, click should work', function() {
+
+    runs(function () {
+      cdb_layer.setOptions({
+        featureOver:  function(ev,latlng,pos,data) {},
+        featureOut:   function() {},
+        featureClick: function(ev,latlng,pos,data) {
+          //console.log(ev,latlng,pos,data);
+        }
+      });      
+
+      var e = new jQuery.Event("click");
+      e.pageX = 10;
+      e.pageY = 10;
+      $(div).trigger(e);
+
+      cdb_layer.interaction.click(e,{x:100,y:100});
+    });
+
+    waits(250);
+
+    runs(function () {
+      
+    });
+  });
 
 });

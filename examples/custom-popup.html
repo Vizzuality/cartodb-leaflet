@@ -16,11 +16,11 @@
   <script type="text/javascript" src="../dist/cartodb-popup-min.js"></script>
 
   <script type="text/javascript">
-    var earthquakes, countries;
+    var earthquakes, countries, map;
 
     function initialize() {
-      var map = new L.Map('map').setView(new L.LatLng(30.718379593199494, -24.99772644042969), 4)
-        , mapboxUrl = 'http://{s}.tiles.mapbox.com/v3/cartodb.map-1nh578vv/{z}/{x}/{y}.png'
+       map = new L.Map('map').setView(new L.LatLng(30.718379593199494, -24.99772644042969), 4);
+      var mapboxUrl = 'http://{s}.tiles.mapbox.com/v3/cartodb.map-1nh578vv/{z}/{x}/{y}.png'
         , mapbox = new L.TileLayer(mapboxUrl, {maxZoom: 18, attribution: "OpenStreetMaps"});
       map.addLayer(mapbox,true);
 
