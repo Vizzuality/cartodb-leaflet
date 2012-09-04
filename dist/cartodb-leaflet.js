@@ -762,25 +762,49 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         if (self.interaction) {
           self.interaction.remove();
 
-          // reqwest({
-          //   method: "get",
-          //   url: grid_url,
-          //   type: 'jsonp',
-          //   jsonpCallback: 'callback',
-          //   jsonpCallbackName: 'grid',
-          //   success: function(result) {
-          //     console.log(result);
-          //     delete img;
-          //   },
-          //   error: function(error) {
-          //     console.log(error);
-          //     delete img;
-          //   },
-          //   complete: function (resp) {
-          //     console.log(resp);
-          //     delete img;
-          //   }
-          // });
+
+          $.ajax({
+            method: "get",
+            url: grid_url,
+            type: 'jsonp',
+            contentType: 'application/json; charset=utf-8',
+            jsonpCallback: 'callback',
+            cache: false,
+            crossDomain: true,
+            success: function(result) {
+              console.log(result);
+              delete img;
+            },
+            error: function(error) {
+              console.log(error);
+              delete img;
+            },
+            complete: function (resp) {
+              console.log(resp);
+              delete img;
+            }
+          })
+
+          reqwest({
+            method: "get",
+            url: grid_url,
+            type: 'jsonp',
+            contentType: 'application/json; charset=utf-8',
+            jsonpCallback: 'callback',
+            jsonpCallbackName: 'grid',
+            success: function(result) {
+              console.log(result);
+              delete img;
+            },
+            error: function(error) {
+              console.log(error);
+              delete img;
+            },
+            complete: function (resp) {
+              console.log(resp);
+              delete img;
+            }
+          });
         }
 
         delete img;   
