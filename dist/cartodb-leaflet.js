@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.54 [September 3, 2012]
+ * @version 0.54 [September 5, 2012]
  * @author: Vizzuality.com
  * @fileoverview <b>Author:</b> Vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -738,6 +738,9 @@ if (typeof(L.CartoDBLayer) === "undefined") {
     },
 
 
+    /**
+     *  Check the tiles
+     */
     _checkTiles: function() {
       var xyz = {z: 4, x: 6, y: 6}
         , self = this
@@ -749,72 +752,42 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       urls.grid_url = urls.grid_url.replace(/\{z\}/g,xyz.z).replace(/\{x\}/g,xyz.x).replace(/\{y\}/g,xyz.y);
 
 
-      img.src = urls.tile_url;
+      reqwest({
+        method: "get",
+        url: urls.grid_url,
+        type: 'jsonp',
+        jsonpCallback: 'callback',
+        jsonpCallbackName: 'grid',
+        success: function() {
+          clearTimeout(timeout)
+        },
+        error: function(error,msg) {
+          if (self.interaction)
+            self.interaction.remove();
 
-      img.onload = function() {
-        delete img;
-      }
-      img.onerror = function() {
+          if (self.options.debug) 
+            throw('There is an error in your query or your interaction parameter');
 
-        self.fire("layererror");
+          self.fire("layererror", msg);
+        }
+      });
 
-        // Remove interaction to prevent more request grid fails
-        if (self.interaction) {
+      // Hacky for reqwest, due to timeout doesn't work very well
+      var timeout = setTimeout(function(){
+        clearTimeout(timeout);
+
+        if (self.interaction)
           self.interaction.remove();
 
+        if (self.options.debug)
+          throw('There is an error in your query or your interaction parameter');
 
-          $.ajax({
-            method: "get",
-            url: grid_url,
-            type: 'jsonp',
-            contentType: 'application/json; charset=utf-8',
-            jsonpCallback: 'callback',
-            cache: false,
-            crossDomain: true,
-            success: function(result) {
-              console.log(result);
-              delete img;
-            },
-            error: function(error) {
-              console.log(error);
-              delete img;
-            },
-            complete: function (resp) {
-              console.log(resp);
-              delete img;
-            }
-          })
-
-          reqwest({
-            method: "get",
-            url: grid_url,
-            type: 'jsonp',
-            contentType: 'application/json; charset=utf-8',
-            jsonpCallback: 'callback',
-            jsonpCallbackName: 'grid',
-            success: function(result) {
-              console.log(result);
-              delete img;
-            },
-            error: function(error) {
-              console.log(error);
-              delete img;
-            },
-            complete: function (resp) {
-              console.log(resp);
-              delete img;
-            }
-          });
-        }
-
-        delete img;   
-      }
+        self.fire("layererror", "There is a problem in your SQL or interaction parameter");
+      },2000);
     }
 
   });
 }
-
-
 
 /*!
   * Reqwest! A general purpose XHR connection manager

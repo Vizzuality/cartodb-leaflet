@@ -34,7 +34,7 @@
         table_name: 'country_colors',
         query: "SELECT * FROM {{table_name}}",
         opacity:0.5,
-        interactivity: "cartodb_id,jamon",
+        interactivity: "cartodb_id",
         featureOver: function(ev,latlng,pos,data) {
           document.body.style.cursor = "pointer";
         },
