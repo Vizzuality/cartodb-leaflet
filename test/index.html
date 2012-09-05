@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>CartoDB Leaflet specs</title>
+    <link rel="shortcut icon" type="image/png" href="../img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="../css/jasmine.css">
+    <script type="text/javascript" src="../js/jasmine.js"></script>
+    <script type="text/javascript" src="../js/jasmine-html.js"></script>
+    <script type="text/javascript" src="../js/jasmine-html.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+
+    <!-- Spec files -->
+    <script type="text/javascript" src="spec/show.js"></script>
+    <script type="text/javascript" src="spec/hide.js"></script>
+    
+    <script type="text/javascript" src="spec/attribution.js"></script>
+    <script type="text/javascript" src="spec/opacity.js"></script>
+
+    <script type="text/javascript" src="spec/interaction.js"></script>
+
+    <!-- Source files -->
+    <script type="text/javascript" src="../js/leaflet.js"></script>
+    <script type="text/javascript" src="../js/wax.leaf.js"></script>
+    <script type="text/javascript" src="../dist/cartodb-leaflet.js"></script>
+
+    <script type="text/javascript">
+      (function() {
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+
+        var trivialReporter = new jasmine.TrivialReporter();
+
+        jasmineEnv.addReporter(trivialReporter);
+
+        jasmineEnv.specFilter = function(spec) {
+          return trivialReporter.specFilter(spec);
+        };
+
+        var currentWindowOnload = window.onload;
+
+        window.onload = function() {
+          if (currentWindowOnload) {
+            currentWindowOnload();
+          }
+          execJasmine();
+        };
+
+        function execJasmine() {
+          jasmineEnv.execute();
+        }
+
+      })();
+    </script>
+
+  </head>
+
+  <body>
+  </body>
+</html>
