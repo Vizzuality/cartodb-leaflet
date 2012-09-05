@@ -7,6 +7,7 @@
 - All functins check first if the layer belongs to the map first.
 - New function isAdded returns if the layer belongs to the map.
 - Hide and show check if the layer is already shown or hidden.
+- Support for hexagons and density visualizations.
 
 [v 0.53]
 - Examples index page back.
