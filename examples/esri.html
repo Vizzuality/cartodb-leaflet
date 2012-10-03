@@ -24,8 +24,8 @@
         , streetMapUrl = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
         , streetMapLayer = new L.TileLayer(streetMapUrl, { maxZoom: 19, attribution: 'Tiles: &copy; Esri' });
 
-      map.setView(new L.LatLng(36.204824, 138.252924), 6).addLayer(streetMapLayer,true);
-
+      map.addLayer(streetMapLayer,true);
+      map.setView(new L.LatLng(36.204824, 138.252924), 6);
 
       // Create a CartoDB popup
       var popup = new L.CartoDBPopup();
@@ -61,7 +61,6 @@
 
       // Adding layer to map
       map.addLayer(earthquakes,false);
-
     }
 
   </script>

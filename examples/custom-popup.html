@@ -46,7 +46,7 @@
         debug: true
       });
       // Adding layer to map
-      map.addLayer(countries);
+      map.addLayer(countries, false);
 
       // Now the CartoDB layer, the earthquakes
       earthquakes = new L.CartoDBLayer({
@@ -65,7 +65,6 @@
           document.body.style.cursor = "default";
         },
         featureClick: function(ev,latlng,pos,data) {
-
           if (typeof( window.event ) != "undefined" ) {
             // IE
             ev.cancelBubble=true;
@@ -89,7 +88,7 @@
       })
 
       // Adding layer to map
-      map.addLayer(earthquakes);
+      map.addLayer(earthquakes, false);
 
     }
   </script>
