@@ -1,4 +1,3 @@
-
 # What is the CartoDB library for Leaflet?
 
 This library allows you to use your own CartoDB tables with Laeflet.
@@ -223,7 +222,7 @@ After that, create the CartoDB layer:
 ```javascript
 var cartodb_leaflet = new L.CartoDBLayer({
   map: map,
-  user_name:'example',
+  user_name:'examples',
   table_name: 'earthquakes',
   query: "SELECT * FROM {{table_name}}",
   tile_style: "#{{table_name}}{marker-fill:red}",
