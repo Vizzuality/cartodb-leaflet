@@ -1,3 +1,6 @@
+[v 0.55]
+- We no longer remove the interaction of the layer if there's a timeout.
+
 [v 0.54]
 - First tests added.
 - Opacity bugs fixed.

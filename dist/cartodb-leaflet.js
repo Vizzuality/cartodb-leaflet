@@ -1,6 +1,6 @@
 /**
  * @name cartodb-leaflet
- * @version 0.54 [September 5, 2012]
+ * @version 0.55 [October 31, 2012]
  * @author: Vizzuality.com
  * @fileoverview <b>Author:</b> Vizzuality.com<br/> <b>Licence:</b>
  *               Licensed under <a
@@ -14,7 +14,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
   L.CartoDBLayer = L.Class.extend({
 
-    version: "0.54",
+    version: "0.55",
 
     includes: L.Mixin.Events,
 
@@ -114,7 +114,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         if (this.options.debug) {
           throw('the layer is not still added to the map');
         } else { return }
-      }   
+      }
 
       if (isNaN(opacity) || opacity>1 || opacity<0) {
         if (this.options.debug) {
@@ -767,7 +767,7 @@ if (typeof(L.CartoDBLayer) === "undefined") {
           if (self.interaction)
             self.interaction.remove();
 
-          if (self.options.debug) 
+          if (self.options.debug)
             throw('There is an error in your query or your interaction parameter');
 
           self.fire("layererror", msg);
@@ -777,9 +777,6 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       // Hacky for reqwest, due to timeout doesn't work very well
       var timeout = setTimeout(function(){
         clearTimeout(timeout);
-
-        if (self.interaction)
-          self.interaction.remove();
 
         if (self.options.debug)
           throw('There is an error in your query or your interaction parameter');
