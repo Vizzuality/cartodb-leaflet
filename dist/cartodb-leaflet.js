@@ -33,7 +33,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       sql_port:       "80",
       sql_protocol:   "http",
       extra_params:   {},
-      cdn_url:        null
+      cdn_url:        null,
+      subdomains:     "abc"
     },
 
     /**
@@ -569,12 +570,28 @@ if (typeof(L.CartoDBLayer) === "undefined") {
 
 
     /**
-     * Generate tilejson for wax
-     * @return {Object} Options for L.TileLayer
-     */
-    _generateTileJson: function () {
+    * Generate tilejson for wax
+    * @return {Object} Options for L.TileLayer
+    */
+    _generateTileJson: function() {
 
       var urls = this._generateTileUrls();
+      var grids_url = urls.grid_url;
+
+      if (urls.grid_url.indexOf("{s}") != -1) {
+
+        grids_url = [];
+
+        var subdomains = this.options.subdomains;
+
+        if (Object.prototype.toString.call( subdomains ) !== '[object Array]' ) {
+          subdomains.split('');
+        }
+
+        for (var i = 0; i < subdomains.length; i++) {
+          grids_url.push(urls.grid_url.replace(/\{s\}/g, subdomains[i]));
+        }
+      }
 
       // Build up the tileJSON
       return {
@@ -583,16 +600,15 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         scheme: 'xyz',
         attribution: this.options.attribution,
         tiles: [urls.tile_url],
-        grids: [urls.grid_url],
+        grids: grids_url,
         tiles_base: urls.tile_url,
-        grids_base: urls.grid_url,
+        grids_base: grids_url,
         opacity: this.options.opacity,
         formatter: function(options, data) {
           return data
         }
       };
     },
-
 
 
     /*
