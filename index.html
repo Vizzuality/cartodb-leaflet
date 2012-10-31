@@ -291,7 +291,7 @@
 
             <tr>
               <td><i>subdomains</i></td>
-              <td>Allows to use different subdomains for the tiler domain ({s}.tiles.domain.com)</td>
+              <td>Allows to use different subdomains for the tiler domain (optional - default = <b>"abc"</b>)</td>
               <td>String or Array</td>
               <td></td>
               <td>No</td>
@@ -398,6 +398,18 @@ var cartodb_leaflet = new L.CartoDBLayer({
               <p class="light"><b>setOptions</b>:  Change any parameter at the same time refreshing the tiles once.</p>
               <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">   cartodb_leaflet.setOptions({query: "SELECT * FROM {{table_name}} WHERE cartodb_id<100", interactivity: "cartodb_id,the_geom,magnitude"});</pre>
             </li>
+
+            <li class="margin15" style="display:block">
+              <p class="light"><b>subodmains</b>:  Allows to use different subdomains for the tiler domain. Used in conjuntion with <code>tiler_domain</code>.</p>
+              <pre class="prettyprint" style="margin:5px 0 0!important" data-language="javascript">
+                ...
+                tiler_domain: "{s}.tiles.domain.com",
+                subdomains: "abcde",
+                ...
+              </pre>
+
+            </li>
+
             <!--li class="margin15" style="display:block">
               <p class="light"><b>setLayerOrder</b>:  _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505</p>
             </li-->
