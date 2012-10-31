@@ -33,9 +33,8 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       sql_port:       "80",
       sql_protocol:   "http",
       extra_params:   {},
-      cdn_url:        null
-
-
+      cdn_url:        null,
+      subdomains:     "abc"
     },
 
     /**
@@ -569,14 +568,29 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       }
     },
 
-
     /**
     * Generate tilejson for wax
     * @return {Object} Options for L.TileLayer
     */
-    _generateTileJson: function () {
+    _generateTileJson: function() {
 
       var urls = this._generateTileUrls();
+      var grids_url = urls.grid_url;
+
+      if (urls.grid_url.indexOf("{s}") != -1) {
+
+        grids_url = [];
+
+        var subdomains = this.options.subdomains;
+
+        if (Object.prototype.toString.call( subdomains ) !== '[object Array]' ) {
+          subdomains.split('');
+        }
+
+        for (var i = 0; i < subdomains.length; i++) {
+          grids_url.push(urls.grid_url.replace(/\{s\}/g, subdomains[i]));
+        }
+      }
 
       // Build up the tileJSON
       return {
@@ -585,15 +599,16 @@ if (typeof(L.CartoDBLayer) === "undefined") {
         scheme: 'xyz',
         attribution: this.options.attribution,
         tiles: [urls.tile_url],
-        grids: [urls.grid_url],
+        grids: grids_url,
         tiles_base: urls.tile_url,
-        grids_base: urls.grid_url,
+        grids_base: grids_url,
         opacity: this.options.opacity,
         formatter: function(options, data) {
           return data
         }
       };
     },
+
 
 
 
@@ -741,54 +756,55 @@ if (typeof(L.CartoDBLayer) === "undefined") {
       }
     },
 
-
     /**
     *  Check the tiles
     */
     _checkTiles: function() {
-      var xyz = {z: 4, x: 6, y: 6}
-      , self = this
-      , img = new Image()
-      , urls = this._generateTileUrls()
+      var xyz = {
+        z: 4,
+        x: 6,
+        y: 6
+      },
+      self = this,
+      img = new Image(),
+      urls = this._generateTileUrls()
 
       // Choose a x-y-z for the check tile - grid
-      urls.tile_url = urls.tile_url.replace(/\{z\}/g,xyz.z).replace(/\{x\}/g,xyz.x).replace(/\{y\}/g,xyz.y);
-      urls.grid_url = urls.grid_url.replace(/\{z\}/g,xyz.z).replace(/\{x\}/g,xyz.x).replace(/\{y\}/g,xyz.y);
-
+      urls.tile_url = urls.tile_url.replace(/\{z\}/g, xyz.z).replace(/\{x\}/g, xyz.x).replace(/\{y\}/g, xyz.y);
+      urls.grid_url = urls.grid_url.replace(/\{z\}/g, xyz.z).replace(/\{x\}/g, xyz.x).replace(/\{y\}/g, xyz.y);
 
       reqwest({
         method: "get",
-        url: urls.grid_url,
+        url: urls.grid_url.replace(/\{s\}/g, "a"),
         type: 'jsonp',
         jsonpCallback: 'callback',
         jsonpCallbackName: 'grid',
         success: function() {
           clearTimeout(timeout)
         },
-        error: function(error,msg) {
-          if (self.interaction)
-            self.interaction.remove();
+        error: function(error, msg) {
+          if (self.interaction) self.interaction.remove();
 
-          if (self.options.debug)
-            throw('There is an error in your query or your interaction parameter');
+          if (self.options.debug) throw ('There is an error in your query or your interaction parameter');
 
           self.fire("layererror", msg);
         }
       });
 
       // Hacky for reqwest, due to timeout doesn't work very well
-      var timeout = setTimeout(function(){
+      var timeout = setTimeout(function() {
         clearTimeout(timeout);
 
-        if (self.options.debug)
-          throw('There is an error in your query or your interaction parameter');
+        if (self.options.debug) throw ('There is an error in your query or your interaction parameter');
 
         self.fire("layererror", "There is a problem in your SQL or interaction parameter");
-      },2000);
+      }, 2000);
     }
 
   });
 }
+
+
 
 /*!
 * Reqwest! A general purpose XHR connection manager
