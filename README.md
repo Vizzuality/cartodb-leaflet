@@ -42,7 +42,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>query</td>
-<td>A SQL query.</td>
+<td>An SQL query.</td>
 <td>String</td>
 <td></td>
 <td>Yes</td>
@@ -66,7 +66,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>featureOver</td>
-<td>A callback when hovers in a feature</td>
+<td>A callback when hovers over a feature</td>
 <td>Function</td>
 <td>
   <b>event:</b> Mouse event object<br/>
@@ -79,7 +79,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>featureOut</td>
-<td>A callback when hovers out a feature</td>
+<td>A callback when hovers off a feature</td>
 <td>Function</td>
 <td></td>
 <td>No (But only will work with `interactivity` specified)</td>
@@ -87,7 +87,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>featureClick</td>
-<td>A callback when clicks in a feature</td>
+<td>A callback when clicks on a feature</td>
 <td>Function</td>
 <td>
   <b>event:</b> Mouse event object<br/>
@@ -116,7 +116,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>auto_bound</td>
-<td>If you want to zoom in the area where the layer is positioned.</td>
+<td>If you want to zoom in to the area where the layer is positioned.</td>
 <td>Boolean</td>
 <td></td>
 <td>No</td>
@@ -155,7 +155,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>sql_protocol</td>
-<td>SQL API protocol (opcional - default = 'http').</td>
+<td>SQL API protocol (optional - default = 'http').</td>
 <td>String</td>
 <td></td>
 <td>No</td>
@@ -163,7 +163,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>sql_domain</td>
-<td>SQL API domain (opcional - default = 'cartodb.com').</td>
+<td>SQL API domain (optional - default = 'cartodb.com').</td>
 <td>String</td>
 <td></td>
 <td>No</td>
@@ -171,7 +171,7 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 <tr>
 <td>sql_port</td>
-<td>SQL API port as a string (opcional - default = '80').</td>
+<td>SQL API port as a string (optional - default = '80').</td>
 <td>String</td>
 <td></td>
 <td>No</td>
@@ -184,13 +184,13 @@ Using the library is really easy. It accepts the following parameters to manage 
 
 If you want to get a feature clicked || hover data (via the `interactivity` parameter), the columns must be in a string separated by commas.
 If you don't want to write the name of the table several times, you can use {{table_name}} in the `query` or `tile_style` parameters.
-We strongly recommend the use of the files available in this repository. These are tested, and if you decide use updated ones, the library could not work.
+We strongly recommend the use of the files available in this repository. These are tested, and if you decide use updated ones, the library may not work.
 
 
 # Creating an example
 
 
-Here's [live example](http://vizzuality.github.com/cartodb-leaflet/examples/custom-popup.html)!
+Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/examples/custom-popup.html)!
 
 
 First of all add the necessary script and css files:
@@ -204,7 +204,7 @@ First of all add the necessary script and css files:
 <script type="text/javascript" src="dist/cartodb-leaflet-min.js"></script>
 <script type="text/javascript" src="dist/cartodb-popup.js"></script>
 ```
-* We strongly recommend to use the library files we have in this repository, they are fully tested.
+* We strongly recommend using the library files we have in this repository, they are fully tested.
 
 
 When the document is loaded, start creating the map:
@@ -250,7 +250,7 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```map.removeLayer(cartodb_leaflet);```
 - **hide**: Hide the cartodb layer from the map.
     Example: ```cartodb_leaflet.hide();```
-- **show**: Show again the cartodb layer in the map.
+- **show**: Show the cartodb layer in the map again.
     Example: ```cartodb_leaflet.show();```
 - **setInteraction**: Set the interaction of your layer to true or false.
     Example: ```cartodb_leaflet.setInteraction(false);```
@@ -258,18 +258,18 @@ New funcionalities are coming, in the meantime you can use:
     Example: ```cartodb_leaflet.setAttribution("CartoDB");```
 - **setOpacity**: Change the opacity of the CartoDB layer.
     Example: ```cartodb_leaflet.setOpacity(0.3);```
-- **setQuery**: Change the query parameter for the layer
+- **setQuery**: Change the query parameter for the layer.
     Example: ```cartodb_leaflet.setQuery("SELECT * FROM {{table_name}} WHERE cartodb_id > 10");```
-- **setStyle**: Change the style of the layer tiles
+- **setStyle**: Change the style of the layer tiles.
     Example: ```cartodb_leaflet.setStyle("#{{table_name}}{marker-fill:blue}");```
-- **isVisible**: Get the visibility of the layer
+- **isVisible**: Get the visibility of the layer.
     Example: ```cartodb_leaflet.isVisible();```
-- **isAdded**: Returns if the layer is already added to the map
+- **isAdded**: Returns true if the layer is already added to the map.
     Example: ```cartodb_leaflet.isAdded();```    
-- **setInteractivity**: Change the columns you want to get data (it needs to reload the tiles)
+- **setInteractivity**: Change the columns you want to get data (it needs to reload the tiles).
     Example: ```cartodb_leaflet.setInteractivity("cartodb_id, the_geom, magnitude");```
-- **setBounds**: Set bounds in the map using a new query or the default one
+- **setBounds**: Set bounds in the map using a new query or the default one.
     Example: ```cartodb_leaflet.setBounds(); || cartodb_leaflet.setBounds("SELECT * FROM {{table_name}} WHERE cartodb_id < 100");```
-- **setOptions**: Change any parameter at the same time refreshing the tiles once
+- **setOptions**: Change any parameter at the same time refreshing the tiles once.
     Example: ```cartodb_leaflet.setOptions({query: "SELECT * FROM {{table_name}} WHERE cartodb_id<100", interactivity: "cartodb_id,the_geom,magnitude"});```
 - **setLayerOrder**: _Not available yet_ -> Waiting for this ticket fixed: https://github.com/CloudMade/Leaflet/issues/505
