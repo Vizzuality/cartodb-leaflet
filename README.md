@@ -194,8 +194,7 @@ We strongly recommend the use of the files available in this repository. These a
 
 ## Creating an example
 
-
-Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/examples/custom-popup.html)!
+There are several usages of this library in [examples](https://github.com/Vizzuality/cartodb-leaflet/tree/master/examples) folder.
 
 
 First of all add the necessary script and css files:
