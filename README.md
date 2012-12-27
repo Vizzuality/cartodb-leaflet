@@ -3,12 +3,12 @@ We have created a new library called [CartoDB.js]() that includes all the funcio
 
 
 
-# What is the CartoDB library for Leaflet?
+## What is the CartoDB library for Leaflet?
 
 This library allows you to use your own CartoDB tables with Laeflet.
 
 
-# Using the library
+## Using the library
 
 Using the library is really easy. It accepts the following parameters to manage the behavior of your CartoDB layers:
 
@@ -185,14 +185,14 @@ Using the library is really easy. It accepts the following parameters to manage 
 </table>
 
 
-# Usage notes
+## Usage notes
 
 If you want to get a feature clicked || hover data (via the `interactivity` parameter), the columns must be in a string separated by commas.
 If you don't want to write the name of the table several times, you can use {{table_name}} in the `query` or `tile_style` parameters.
 We strongly recommend the use of the files available in this repository. These are tested, and if you decide use updated ones, the library may not work.
 
 
-# Creating an example
+## Creating an example
 
 
 Here's a [live example](http://vizzuality.github.com/cartodb-leaflet/examples/custom-popup.html)!
@@ -247,7 +247,7 @@ map.addLayer(cartodb_leaflet);
 ```
 
 
-# Functions
+## Functions
 New funcionalities are coming, in the meantime you can use:
 
 
